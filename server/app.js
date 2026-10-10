@@ -18,7 +18,7 @@ const FrontEnd_URL = process.env.FrontEnd_URL
 app.use(cors({
   origin: [
     'http://localhost:5173',
-    FrontEnd_URL
+    'https://pack-port-ivu59eor4-shauryagupta2006s-projects.vercel.app'
   ],
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
   credentials: true
