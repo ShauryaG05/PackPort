@@ -12,7 +12,7 @@ PackPort is a centralized package telemetry and remote runtime maintenance platf
 
 | Resource | URL | Description |
 | :--- | :--- | :--- |
-| **Documentation Portal** | [https://packport-docs.vercel.app/](https://packport-docs.vercel.app/) | Interactive architecture diagrams and telemetry flows |
+| **Program Flow** | [https://packport-docs.vercel.app/](https://packport-docs.vercel.app/) | Interactive architecture diagrams and telemetry flows |
 | **GitHub Repository** | [https://github.com/ShauryaGupta2006/PackPort](https://github.com/ShauryaGupta2006/PackPort) | Source code and version control |
 | **Production Web Dashboard** | `https://your-dashboard-url.com` | Deployed administrative frontend |
 | **Control Plane API** | `https://your-api-url.com` | Backend REST API & WebSocket server |
