@@ -2,7 +2,7 @@ const os = require("os");
 const { execSync } = require("child_process");
 require("dotenv").config();
 
-const BackendURL = process.env.BACKEND_URI || "http://localhost:5600";
+const BackendURL = process.env.BACKEND_URI || "https://packport.onrender.com";
 const { io } = require("socket.io-client");
 
 console.log("=========================================");

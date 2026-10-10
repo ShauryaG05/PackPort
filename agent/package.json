@@ -1,12 +1,19 @@
 {
-  "name": "agent",
-  "version": "1.0.0",
+  "name": "packport-cli",
+  "version": "1.0.1",
   "description": "PackPort Agent",
   "main": "agent.js",
   "scripts": {
     "start": "node agent.js",
     "build:exe": "pkg agent.js --targets node18-win-x64 --output PackPortAgent.exe"
   },
+  "bin": {
+    "packport": "./cli.js"
+  },
+  "files": [
+    "cli.js",
+    "agent.js"
+  ],
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -15,6 +22,7 @@
     "axios": "^1.20.0",
     "dotenv": "^18.0.1",
     "mongoose": "^9.10.1",
+    "packport-cli": "^1.0.0",
     "socket.io-client": "^4.8.3",
     "ws": "^8.21.3"
   },
