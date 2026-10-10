@@ -1,0 +1,24 @@
+{
+  "name": "agent",
+  "version": "1.0.0",
+  "description": "PackPort Agent",
+  "main": "agent.js",
+  "scripts": {
+    "start": "node agent.js",
+    "build:exe": "pkg agent.js --targets node18-win-x64 --output PackPortAgent.exe"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "axios": "^1.20.0",
+    "dotenv": "^18.0.1",
+    "mongoose": "^9.10.1",
+    "socket.io-client": "^4.8.3",
+    "ws": "^8.21.3"
+  },
+  "devDependencies": {
+    "pkg": "^5.8.1"
+  }
+}
