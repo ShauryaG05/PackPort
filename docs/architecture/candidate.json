@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "PackPort End-to-End Package Telemetry Flow",
+    "output": ".archify/sequence-packport-flow-20261010-095718/packport-flow.html",
+    "viewBox": [1035, 666],
+    "column_fit": "spread",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/ShauryaGupta2006/PackPort.git",
+      "provider": "github",
+      "revision": "ec9f28a26d86cb11546124b3bbdacc8704bb448b"
+    }
+  },
+  "participants": [
+    { "id": "user", "type": "external", "label": "Developer", "sublabel": "browser session", "icon": "person" },
+    { "id": "view", "type": "frontend", "label": "PackPort UI", "sublabel": "React + Socket.IO", "icon": "frontend",
+      "sources": [
+        { "path": "View/src/App.jsx", "line": 32, "label": "routes" },
+        { "path": "View/src/Pages/Dashboard.jsx", "line": 225, "label": "socket + telemetry" }
+      ] },
+    { "id": "server", "type": "backend", "label": "PackPort API", "sublabel": "Express + Socket.IO", "icon": "backend",
+      "sources": [
+        { "path": "server/src/Routes/authRoutes.js", "line": 8, "label": "auth routes" },
+        { "path": "server/src/Routes/agentRoutes.js", "line": 85, "label": "scan + update routes" },
+        { "path": "server/server.js", "line": 20, "label": "telemetry socket handlers" }
+      ] },
+    { "id": "agent", "type": "external", "label": "Local Agent", "sublabel": "CLI on dev machine", "icon": "external",
+      "sources": [
+        { "path": "agent/agent.js", "line": 82, "label": "python_scan handler" },
+        { "path": "agent/agent.js", "line": 171, "label": "node_scan handler" },
+        { "path": "agent/agent.js", "line": 47, "label": "update handlers" }
+      ] },
+    { "id": "db", "type": "database", "label": "MongoDB", "sublabel": "User telemetry", "icon": "database",
+      "sources": [
+        { "path": "server/src/models/userModel.js", "line": 4, "label": "user telemetry schema" }
+      ] }
+  ],
+  "segments": [
+    { "from": 150, "to": 282, "label": "Authenticate" },
+    { "from": 288, "to": 340, "label": "Trigger scan" },
+    { "from": 346, "to": 456, "label": "Collect telemetry" },
+    { "from": 464, "to": 568, "label": "Apply update" }
+  ],
+  "messages": [
+    { "id": "open", "from": "user", "to": "view", "y": 160, "label": "Sign up / Log in", "variant": "default" },
+    { "id": "auth", "from": "view", "to": "server", "y": 188, "label": "POST /auth/signup | /auth/login", "variant": "emphasis" },
+    { "id": "create-user", "from": "server", "to": "db", "y": 216, "label": "create user + assign agentCode", "variant": "default" },
+    { "id": "set-cookie", "from": "server", "to": "view", "y": 244, "label": "JWT httpOnly cookie", "variant": "security" },
+
+    { "id": "scan-req", "from": "view", "to": "server", "y": 272, "label": "GET /agent/python_scan", "variant": "emphasis" },
+    { "id": "scan-push", "from": "server", "to": "agent", "y": 300, "label": "socket.emit('python_scan')", "variant": "dashed" },
+
+    { "id": "telemetry", "from": "agent", "to": "server", "y": 328, "label": "result_python_packages", "variant": "emphasis" },
+    { "id": "persist", "from": "server", "to": "db", "y": 356, "label": "persist packages + lastScanned", "variant": "emphasis" },
+    { "id": "scan-complete", "from": "server", "to": "view", "y": 384, "label": "socket.emit('scan_complete')", "variant": "dashed" },
+    { "id": "fetch-pkgs", "from": "view", "to": "server", "y": 412, "label": "GET /agent/packages/python", "variant": "default" },
+    { "id": "pkgs-json", "from": "server", "to": "view", "y": 440, "label": "200 telemetry JSON", "variant": "return" },
+
+    { "id": "update-req", "from": "view", "to": "server", "y": 468, "label": "POST /agent/update/:pkgName", "variant": "emphasis" },
+    { "id": "update-push", "from": "server", "to": "agent", "y": 496, "label": "socket.emit('update_python')", "variant": "dashed" },
+    { "id": "poll", "from": "view", "to": "server", "y": 524, "label": "poll GET /agent/packages", "variant": "default" },
+    { "id": "poll-return", "from": "server", "to": "view", "y": 552, "label": "refreshed telemetry", "variant": "return" }
+  ],
+  "activations": [
+    { "participant": "view", "from": 158, "to": 568, "type": "frontend" },
+    { "participant": "server", "from": 184, "to": 568, "type": "backend" },
+    { "participant": "db", "from": 212, "to": 240, "type": "database" },
+    { "participant": "agent", "from": 324, "to": 364, "type": "external" },
+    { "participant": "db", "from": 352, "to": 368, "type": "database" },
+    { "participant": "agent", "from": 492, "to": 552, "type": "external" }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "Onboarding & Auth", "items": [
+      "Signup assigns each user a unique agentCode",
+      "The JWT is issued as an httpOnly cookie, not stored in JS",
+      "The local agent connects outbound to the server over Socket.IO"
+    ] },
+    { "dot": "orange", "title": "Async Telemetry", "items": [
+      "Scans are triggered over REST, then pushed to the agent as socket events",
+      "The agent runs local pip / npm commands and reports back",
+      "The server persists telemetry, then emits scan_complete to refresh the dashboard"
+    ] },
+    { "dot": "violet", "title": "Fire-and-Forget Updates", "items": [
+      "Upgrade requests emit an update_python / update_node socket command",
+      "The agent runs pip install --upgrade or npm install -g",
+      "The UI re-polls telemetry to reflect the new state"
+    ] }
+  ]
+}
