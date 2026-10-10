@@ -14,10 +14,11 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+const FrontEnd_URL = process.env.FrontEnd_URL
 app.use(cors({
   origin: [
     'http://localhost:5173',
-    'https://pack-port-nine.vercel.app/'
+    FrontEnd_URL,
   ],
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
   credentials: true
