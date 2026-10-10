@@ -15,8 +15,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(cors({
-    origin: process.env.FrontEnd_URI || "http://localhost:5173",
-    credentials: true
+  origin: [
+    'http://localhost:5173',
+    'https://pack-port-nine.vercel.app/'
+  ],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+  credentials: true
 }));
 // Routes
 const authRoutes = require("./src/Routes/authRoutes");
