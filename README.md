@@ -1,6 +1,22 @@
 # PackPort
 
+[![Documentation](https://img.shields.io/badge/docs-live%20reference-blue?style=flat-square)](https://packport-docs.vercel.app/)
+[![Node.js](https://img.shields.io/badge/node-%3E%3D18.0.0-informational?style=flat-square)](https://nodejs.org)
+[![Python](https://img.shields.io/badge/python-%3E%3D3.8-informational?style=flat-square)](https://python.org)
+
 PackPort is a centralized package telemetry and remote runtime maintenance platform for developer environments. It provides real-time visibility into global runtime environments, installed dependencies, and outdated packages across Python (`pip`) and Node.js (`npm`) ecosystems, paired with remote upgrade execution through a lightweight local daemon.
+
+---
+
+## Links & Resources
+
+| Resource | URL | Description |
+| :--- | :--- | :--- |
+| **Documentation Portal** | [https://packport-docs.vercel.app/](https://packport-docs.vercel.app/) | Interactive architecture diagrams and telemetry flows |
+| **GitHub Repository** | [https://github.com/ShauryaGupta2006/PackPort](https://github.com/ShauryaGupta2006/PackPort) | Source code and version control |
+| **Production Web Dashboard** | `https://your-dashboard-url.com` | Deployed administrative frontend |
+| **Control Plane API** | `https://your-api-url.com` | Backend REST API & WebSocket server |
+| **Issue Tracker** | [https://github.com/ShauryaGupta2006/PackPort/issues](https://github.com/ShauryaGupta2006/PackPort/issues) | Bug reports and feature requests |
 
 ---
 
