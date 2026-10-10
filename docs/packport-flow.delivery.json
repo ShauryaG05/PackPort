@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "fb9a6141-9960-4220-ad27-f24741f725d8",
+  "status": "current",
+  "command": "deliver",
+  "type": "sequence",
+  "input": "/Users/shaurya/Desktop/Termi/PackPort/.archify/sequence-packport-flow-20261010-095718/candidate.json",
+  "output": "/Users/shaurya/Desktop/Termi/PackPort/.archify/sequence-packport-flow-20261010-095718/packport-flow.html",
+  "specification": {
+    "sha256": "7e2d6659a1225abf82055961a500bfcc9417428ebe6149908d7f0c3afb1f56ae",
+    "bytes": 5525
+  },
+  "artifact": {
+    "sha256": "1ee7fd8bcf40a7281a89ec577356f085dc9115e5178a5fccf452cb04d310f69f",
+    "bytes": 763464
+  }
+}
