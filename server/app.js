@@ -18,7 +18,7 @@ const FrontEnd_URL = process.env.FrontEnd_URL
 app.use(cors({
   origin: [
     'http://localhost:5173',
-    FrontEnd_URL,
+    FrontEnd_URL
   ],
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
   credentials: true
