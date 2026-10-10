@@ -1,0 +1,249 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/geist";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --color-background: #0d1117;
+  --color-on-surface: #f0f6fc;
+  --color-on-surface-variant: #8b949e;
+  --color-surface: #161b22;
+  --color-surface-container: #161b22;
+  --color-surface-container-high: #21262d;
+  --color-surface-container-lowest: #010409;
+  --color-surface-variant: #21262d;
+  --color-outline: #30363d;
+  --color-outline-variant: #21262d;
+
+  --color-primary: #2563eb;
+  --color-primary-container: #1f6beb;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #ffffff;
+  --color-primary-fixed: #58a6ff;
+
+  --color-secondary: #58a6ff;
+  --color-secondary-container: #1f6beb;
+
+  --color-tertiary: #38bdf8;
+  --color-error: #f85149;
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: #0d1117;
+    color: #c9d1d9;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+    @apply bg-background text-foreground;
+  }
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans;
+  }
+}
+
+/* Custom Grid Background Pattern */
+.bg-grid-animated {
+  background-size: 36px 36px;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  mask-image: radial-gradient(ellipse at center, black 50%, transparent 90%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 50%, transparent 90%);
+  animation: grid-panning 25s linear infinite;
+}
+
+@keyframes grid-panning {
+  0% {
+    background-position: 0px 0px;
+  }
+  100% {
+    background-position: 36px 36px;
+  }
+}
+
+/* Light Beam Sweep */
+@keyframes beam-sweep {
+  0% {
+    transform: translateX(-100%) rotate(-15deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.6;
+  }
+  80% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateX(200%) rotate(-15deg);
+    opacity: 0;
+  }
+}
+
+.animate-beam-sweep {
+  animation: beam-sweep 8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Floating Glow Orbs */
+@keyframes float-orb-1 {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(40px, -30px) scale(1.1);
+  }
+  66% {
+    transform: translate(-25px, 35px) scale(0.95);
+  }
+}
+
+@keyframes float-orb-2 {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(-35px, 40px) scale(1.15);
+  }
+  66% {
+    transform: translate(30px, -20px) scale(0.9);
+  }
+}
+
+.animate-float-1 {
+  animation: float-orb-1 14s ease-in-out infinite;
+}
+
+.animate-float-2 {
+  animation: float-orb-2 18s ease-in-out infinite;
+}
+
+/* Text Glow Effect */
+.text-glow {
+  text-shadow: 0 0 25px rgba(59, 130, 246, 0.5), 0 0 50px rgba(139, 92, 246, 0.3);
+}
+
+/* Scan Line Animation */
+@keyframes scan {
+  0% {
+    top: 0%;
+    opacity: 0.2;
+  }
+
+  50% {
+    opacity: 0.9;
+  }
+
+  100% {
+    top: 100%;
+    opacity: 0.2;
+  }
+}
+
+.animate-scan {
+  animation: scan 4s ease-in-out infinite;
+}
+
+/* Custom Scrollbar for Terminal */
+.terminal-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.terminal-scroll::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.6);
+  border-radius: 4px;
+}
+
+.terminal-scroll::-webkit-scrollbar-thumb {
+  background: rgba(59, 130, 246, 0.3);
+  border-radius: 4px;
+}
+
+.terminal-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(59, 130, 246, 0.6);
+}
+
+@theme inline {
+  --font-heading: var(--font-sans);
+  --font-sans: 'Geist Variable', sans-serif;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root,
+.dark {
+  --background: #0d1117;
+  --foreground: #f0f6fc;
+  --card: #161b22;
+  --card-foreground: #f0f6fc;
+  --popover: #161b22;
+  --popover-foreground: #f0f6fc;
+  --primary: #2563eb;
+  --primary-foreground: #ffffff;
+  --secondary: #21262d;
+  --secondary-foreground: #f0f6fc;
+  --muted: #21262d;
+  --muted-foreground: #8b949e;
+  --accent: #21262d;
+  --accent-foreground: #f0f6fc;
+  --destructive: #f85149;
+  --border: rgba(240, 246, 252, 0.1);
+  --input: rgba(240, 246, 252, 0.15);
+  --ring: #58a6ff;
+  --chart-1: #58a6ff;
+  --chart-2: #38bdf8;
+  --chart-3: #d29922;
+  --chart-4: #f85149;
+  --chart-5: #a371f7;
+  --radius: 0.625rem;
+  --sidebar: #161b22;
+  --sidebar-foreground: #f0f6fc;
+  --sidebar-primary: #2563eb;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #21262d;
+  --sidebar-accent-foreground: #f0f6fc;
+  --sidebar-border: rgba(240, 246, 252, 0.1);
+  --sidebar-ring: #58a6ff;
+}
