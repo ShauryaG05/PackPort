@@ -46,6 +46,13 @@ io.on("connection", (socket) => {
             socket.data.type = "agent";
             socket.join(`agent:${trimmedCode}`);
             console.log(`[Socket] Registered Agent for code: ${trimmedCode} in room agent:${trimmedCode} (Socket: ${socket.id})`);
+
+            // Notify user dashboard that agent is online
+            io.to(`user:${trimmedCode}`).emit("agent_status", {
+                online: true,
+                agentCode: trimmedCode,
+                timestamp: new Date()
+            });
         } catch (err) {
             console.error("[Socket] Agent registration error:", err.message);
         }
@@ -59,6 +66,15 @@ io.on("connection", (socket) => {
         socket.data.type = "dashboard";
         socket.join(`user:${trimmedCode}`);
         console.log(`[Socket] Registered Dashboard for code: ${trimmedCode} in room user:${trimmedCode} (Socket: ${socket.id})`);
+
+        // Check if agent is currently connected and notify this dashboard immediately
+        const agentRoom = io.sockets.adapter.rooms.get(`agent:${trimmedCode}`);
+        const isOnline = Boolean(agentRoom && agentRoom.size > 0);
+        socket.emit("agent_status", {
+            online: isOnline,
+            agentCode: trimmedCode,
+            timestamp: new Date()
+        });
     };
 
     // Check handshake auth or query for upfront registration
@@ -186,6 +202,20 @@ io.on("connection", (socket) => {
 
     socket.on("disconnect", () => {
         console.log(`Socket Client Disconnected: ${socket.id} (${socket.data.type || "unknown"}: ${socket.data.agentCode || "unassigned"})`);
+        if (socket.data.type === "agent" && socket.data.agentCode) {
+            const agentCode = socket.data.agentCode;
+            setTimeout(() => {
+                const agentRoom = io.sockets.adapter.rooms.get(`agent:${agentCode}`);
+                const isStillOnline = Boolean(agentRoom && agentRoom.size > 0);
+                if (!isStillOnline) {
+                    io.to(`user:${agentCode}`).emit("agent_status", {
+                        online: false,
+                        agentCode: agentCode,
+                        timestamp: new Date()
+                    });
+                }
+            }, 300);
+        }
     });
 });
 

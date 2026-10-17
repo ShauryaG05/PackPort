@@ -101,6 +101,7 @@ export default function Dashboard() {
   const [scanning, setScanning] = useState(false);
   const [copiedItem, setCopiedItem] = useState(null);
   const [user, setUser] = useState(null);
+  const [agentOnline, setAgentOnline] = useState(false);
   const [activeUpdates, setActiveUpdates] = useState([]);
 
   const backendUrl = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_URL || (import.meta.env.PROD ? "https://packport.onrender.com" : "http://localhost:5600");
@@ -212,6 +213,18 @@ export default function Dashboard() {
             setUser(userData.user);
           }
         }
+
+        // Fetch initial live agent connection status
+        const statusRes = await fetch(`${backendUrl}/agent/status`, {
+          method: "GET",
+          credentials: "include",
+        });
+        if (statusRes.ok) {
+          const statusData = await statusRes.json();
+          if (isMounted && typeof statusData.online === "boolean") {
+            setAgentOnline(statusData.online);
+          }
+        }
       } catch (err) {
         console.error("Auth check error:", err);
       }
@@ -223,6 +236,13 @@ export default function Dashboard() {
     init();
 
     const socket = io(backendUrl);
+
+    socket.on("agent_status", (payload) => {
+      if (typeof payload?.online === "boolean") {
+        setAgentOnline(payload.online);
+      }
+    });
+
     socket.on("scan_complete", (payload) => {
       if (!payload?.agentCode || !user?.agentCode || payload.agentCode === user.agentCode) {
         if (payload?.language) {
@@ -235,7 +255,24 @@ export default function Dashboard() {
       isMounted = false;
       socket.disconnect();
     };
-  }, [backendUrl, fetchTelemetry]);
+  }, [backendUrl, fetchTelemetry, user?.agentCode]);
+
+  // Register dashboard on room when agentCode becomes available
+  useEffect(() => {
+    if (!user?.agentCode) return;
+    const socket = io(backendUrl);
+    socket.emit("register_dashboard", { agentCode: user.agentCode });
+
+    socket.on("agent_status", (payload) => {
+      if (typeof payload?.online === "boolean") {
+        setAgentOnline(payload.online);
+      }
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [backendUrl, user?.agentCode]);
 
   // Scan trigger
   async function triggerScanAll() {
@@ -418,11 +455,20 @@ export default function Dashboard() {
         <div className="space-y-1.5">
           <div className="flex flex-wrap items-center gap-2 mb-2">
             <span className="relative flex h-2.5 w-2.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+              {agentOnline && (
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              )}
+              <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${agentOnline ? "bg-emerald-500" : "bg-gray-500"}`}></span>
             </span>
-            <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/30 text-[11px] font-mono font-medium">
-              System Agent Online
+            <Badge
+              variant="outline"
+              className={`text-[11px] font-mono font-medium border transition-colors ${
+                agentOnline
+                  ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
+                  : "bg-gray-500/10 text-gray-400 border-gray-500/30"
+              }`}
+            >
+              Agent {agentOnline ? "Online" : "Offline"}
             </Badge>
 
             {user?.agentCode && (

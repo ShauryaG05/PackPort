@@ -37,8 +37,6 @@ const PLATFORMS = {
     format: ".zip",
     available: true,
     href: "/downloads/PackPort-Windows.zip",
-    secondaryHref: "/downloads/PackPortAgent.exe",
-    secondaryLabel: "Standalone .exe (40 MB)",
     subtext: "Portable ZIP Archive",
     icon: (
       <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">

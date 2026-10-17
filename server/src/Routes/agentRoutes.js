@@ -125,13 +125,24 @@ route.use(authMiddleware);
 route.get("/status", async (req, res) => {
     try {
         const user = req.user;
+        const io = req.app.get("io");
+        let isOnline = false;
+
+        if (io && user.agentCode) {
+            const agentRoom = io.sockets.adapter.rooms.get(`agent:${user.agentCode}`);
+            isOnline = Boolean(agentRoom && agentRoom.size > 0);
+        }
+
         res.status(200).json({
             success: true,
+            online: isOnline,
             agentCode: user.agentCode,
             user: {
                 id: user._id,
                 name: user.name,
                 email: user.email,
+                agentCode: user.agentCode,
+                createdAt: user.createdAt,
             },
             telemetry: {
                 python: {

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { io } from "socket.io-client";
 import PackPortLogo from "../components/PackPortLogo";
 import Navbar from "../components/Navbar";
 
@@ -114,6 +115,7 @@ export default function Layout({ children }) {
     const location = useLocation();
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
+    const [agentOnline, setAgentOnline] = useState(false);
 
     async function handleLogout() {
         try {
@@ -126,6 +128,7 @@ export default function Layout({ children }) {
 
             if (data.success) {
                 setUser(null);
+                setAgentOnline(false);
                 navigate("/");
             } else {
                 alert("Logout Failed");
@@ -145,11 +148,23 @@ export default function Layout({ children }) {
                     credentials: "include",
                 });
                 const data = await res.json();
-                if (isMounted && data.user?.name) {
+                if (isMounted && data.user) {
                     setUser(data.user);
                 }
+
+                // Initial agent status check
+                const statusRes = await fetch(`${backendUrl}/agent/status`, {
+                    method: "GET",
+                    credentials: "include",
+                });
+                if (statusRes.ok) {
+                    const statusData = await statusRes.json();
+                    if (isMounted && typeof statusData.online === "boolean") {
+                        setAgentOnline(statusData.online);
+                    }
+                }
             } catch (error) {
-                console.error("Failed to fetch user:", error);
+                console.error("Failed to fetch user or agent status:", error);
             }
         }
 
@@ -158,6 +173,25 @@ export default function Layout({ children }) {
             isMounted = false;
         };
     }, []);
+
+    // Real-time agent status via Socket.IO
+    useEffect(() => {
+        if (!user?.agentCode) return;
+        const backendUrl = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_URL || (import.meta.env.PROD ? "https://packport.onrender.com" : "http://localhost:5600");
+        const socket = io(backendUrl);
+
+        socket.emit("register_dashboard", { agentCode: user.agentCode });
+
+        socket.on("agent_status", (payload) => {
+            if (typeof payload?.online === "boolean") {
+                setAgentOnline(payload.online);
+            }
+        });
+
+        return () => {
+            socket.disconnect();
+        };
+    }, [user?.agentCode]);
 
     const navigationItems = [
         {
@@ -250,19 +284,28 @@ export default function Layout({ children }) {
                     </button>
                 </div>
 
-                {/* System Status Card - Refined Dell/HP Style */}
+                {/* Agent Status Card - Dynamic Connection State */}
                 <div className="px-4 pt-6 pb-4">
                     <Card className="bg-background/40 border-outline p-3 shadow-sm">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <span className="relative flex h-2 w-2">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                                    {agentOnline && (
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                    )}
+                                    <span className={`relative inline-flex rounded-full h-2 w-2 ${agentOnline ? "bg-emerald-500" : "bg-gray-500"}`}></span>
                                 </span>
-                                <span className="text-[11px] font-medium text-gray-300">System Agent</span>
+                                <span className="text-[11px] font-medium text-gray-300">Agent</span>
                             </div>
-                            <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 bg-emerald-500/10 text-emerald-400 border-emerald-500/20">
-                                Online
+                            <Badge
+                                variant="secondary"
+                                className={`text-[10px] px-1.5 py-0 h-4 border transition-colors ${
+                                    agentOnline
+                                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                                        : "bg-gray-500/10 text-gray-400 border-gray-500/20"
+                                }`}
+                            >
+                                {agentOnline ? "Online" : "Offline"}
                             </Badge>
                         </div>
                     </Card>
@@ -338,11 +381,11 @@ export default function Layout({ children }) {
                     <div className="flex items-center justify-between p-2 rounded-xl bg-[#161b22] border border-outline transition-all hover:border-primary/30 group">
                         <NavLink to="/user" className="flex items-center gap-3 min-w-0 flex-1 hover:opacity-90 transition-opacity">
                             <div className="w-9 h-9 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center font-bold text-xs text-primary shrink-0">
-                                {user?.name ? user.name[0].toUpperCase() : "A"}
+                                {user?.name ? user.name[0].toUpperCase() : (user?.email ? user.email[0].toUpperCase() : "U")}
                             </div>
                             <div className="truncate">
                                 <p className="text-xs font-semibold text-white truncate">
-                                    {user?.name || user?.email || "Admin User"}
+                                    {user?.name || (user?.email ? user.email.split('@')[0] : "User")}
                                 </p>
                                 <p className="text-[10px] text-gray-500 font-mono truncate">
                                     {user?.agentCode ? `Agent ${user.agentCode}` : "v1.0.0-stable"}
@@ -375,7 +418,7 @@ export default function Layout({ children }) {
 
                 {/* Dynamic Route Content Area */}
                 <main className="flex-1 overflow-y-auto bg-background p-4 md:p-8">
-                    {children || <Outlet />}
+                    {children || <Outlet context={{ user, agentOnline }} />}
                 </main>
             </div>
         </div>
