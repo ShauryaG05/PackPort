@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import PackPortLogo, { PackPortIcon } from "../components/PackPortLogo";
+import Navbar from "../components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -228,47 +229,7 @@ export default function DownloadPage() {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col antialiased">
       {/* ── Navigation ── */}
-      <header className="border-b border-border bg-card/90 backdrop-blur-md sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            <Link to="/" className="hover:opacity-90 transition-opacity">
-              <PackPortLogo size={34} />
-            </Link>
-            <Separator orientation="vertical" className="h-6 hidden md:block" />
-            <nav className="hidden md:flex items-center gap-5">
-              <Link
-                to="/docs/cli"
-                className="text-xs text-muted-foreground hover:text-foreground transition-colors font-medium"
-              >
-                Docs
-              </Link>
-              <Link to="/download" className="text-xs text-primary-fixed font-medium">
-                Download
-              </Link>
-              <Link
-                to="/dashboard"
-                className="text-xs text-muted-foreground hover:text-foreground transition-colors font-medium"
-              >
-                Dashboard
-              </Link>
-            </nav>
-          </div>
-
-          <div className="flex items-center gap-3">
-            {/* Version pill */}
-            <div className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-card border border-border text-xs text-muted-foreground">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#7bdb80] animate-pulse" />
-              <span>v1.0 Stable</span>
-            </div>
-            <Link
-              to="/auth/login"
-              className="text-xs font-medium text-muted-foreground hover:text-foreground px-3 py-1.5 rounded-lg transition-colors"
-            >
-              Sign In
-            </Link>
-          </div>
-        </div>
-      </header>
+      <Navbar />
 
       <main className="flex-1 flex flex-col items-center">
         {/* ═══════════════════════════════════════════

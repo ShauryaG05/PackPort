@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import PackPortLogo from "../components/PackPortLogo";
+import Navbar from "../components/Navbar";
 import {
   Terminal,
   ArrowRight,
@@ -24,7 +25,7 @@ export default function Home() {
 
   async function checkAuth() {
     try {
-      const backendUrl = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_URL || "http://localhost:5600";
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_URL || (import.meta.env.PROD ? "https://packport.onrender.com" : "http://localhost:5600");
       const response = await fetch(`${backendUrl}/auth/check`, {
         method: "GET",
         credentials: "include",
@@ -49,32 +50,12 @@ export default function Home() {
     <>
       <div className="min-h-screen bg-background text-[#c9d1d9] flex flex-col justify-between selection:bg-secondary-container/30 selection:text-on-surface antialiased">
         {/* Navigation */}
-        <header className="border-b border-outline bg-surface/90 backdrop-blur-md sticky top-0 z-50">
-          <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-            <Link to="/" className="hover:opacity-90 transition-opacity">
-              <PackPortLogo size={34} />
-            </Link>
-
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-outline bg-surface text-xs font-medium text-on-surface">
-                <span className="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span>
-                <span>Logged In</span>
-              </div>
-              <Link
-                to="/dashboard"
-                className="text-xs sm:text-sm font-medium text-white bg-primary hover:bg-primary-container active:bg-primary px-3.5 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm"
-              >
-                Dashboard
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-          </div>
-        </header>
+        <Navbar authenticated={Authenticated} setAuthenticated={setAuthenticated} />
 
         {/* Main Content */}
         <main className="max-w-4xl mx-auto px-6 py-16 sm:py-20 flex-1 flex flex-col items-center text-center justify-center">
           {/* Project Tagline Pill */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-outline bg-surface text-secondary text-xs font-medium mb-8">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border-2 border-outline bg-surface text-white text-xs font-medium mb-8">
             <span className="w-1.5 h-1.5 rounded-full bg-secondary"></span>
             <span>Unified Developer Package & Port Telemetry</span>
           </div>
@@ -142,7 +123,7 @@ export default function Home() {
           </div>
 
           {/* Key Features Grid (Clean & Structured) */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-left w-full pt-4 border-t border-outline">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left w-full max-w-3xl pt-4 border-t border-outline">
             <div className="p-5 rounded-xl bg-surface border border-outline flex flex-col justify-between shadow-md">
               <div>
                 <div className="w-8 h-8 rounded-lg bg-secondary/10 border border-secondary/20 text-secondary flex items-center justify-center mb-3.5">
@@ -172,21 +153,6 @@ export default function Home() {
                 </p>
               </div>
             </div>
-
-            <div className="p-5 rounded-xl bg-surface border border-outline flex flex-col justify-between shadow-md">
-              <div>
-                <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/30 text-tertiary flex items-center justify-center mb-3.5">
-                  <Activity className="w-4 h-4" />
-                </div>
-                <h2 className="text-sm font-semibold text-on-surface mb-1.5">
-                  Port & Process Telemetry
-                </h2>
-                <p className="text-xs text-on-surface-variant leading-relaxed">
-                  Keep track of local dev servers, active port allocations, and
-                  connected background agents effortlessly.
-                </p>
-              </div>
-            </div>
           </div>
         </main>
 
@@ -207,30 +173,8 @@ export default function Home() {
     </>
   ) : (
     <div className="min-h-screen bg-background text-[#c9d1d9] flex flex-col justify-between selection:bg-secondary-container/30 selection:text-on-surface antialiased">
-      {/* Navigation */}
-      <header className="border-b border-outline bg-surface/90 backdrop-blur-md sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link to="/" className="hover:opacity-90 transition-opacity">
-            <PackPortLogo size={34} />
-          </Link>
-
-          <div className="flex items-center gap-3">
-            <Link
-              to="/auth/login"
-              className="text-xs sm:text-sm font-medium text-on-surface-variant hover:text-on-surface px-3.5 py-1.5 rounded-lg transition-colors hover:bg-surface-variant"
-            >
-              Sign In
-            </Link>
-            <Link
-              to="/auth/signup"
-              className="text-xs sm:text-sm font-medium text-white bg-primary hover:bg-primary-container active:bg-primary px-4 py-2 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm"
-            >
-              Get Started
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-        </div>
-      </header>
+        {/* Navigation */}
+        <Navbar authenticated={Authenticated} setAuthenticated={setAuthenticated} />
 
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-6 py-16 sm:py-20 flex-1 flex flex-col items-center text-center justify-center">
@@ -313,7 +257,7 @@ export default function Home() {
         </div>
 
         {/* Key Features Grid (Clean & Structured) */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-left w-full pt-4 border-t border-outline">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left w-full max-w-3xl pt-4 border-t border-outline">
           <div className="p-5 rounded-xl bg-surface border border-outline flex flex-col justify-between shadow-md">
             <div>
               <div className="w-8 h-8 rounded-lg bg-secondary/10 border border-secondary/20 text-secondary flex items-center justify-center mb-3.5">
@@ -340,21 +284,6 @@ export default function Home() {
               <p className="text-xs text-on-surface-variant leading-relaxed">
                 Continuously inventory installed global packages, diagnose
                 drift, and flag outdated dependencies immediately.
-              </p>
-            </div>
-          </div>
-
-          <div className="p-5 rounded-xl bg-surface border border-outline flex flex-col justify-between shadow-md">
-            <div>
-              <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/30 text-tertiary flex items-center justify-center mb-3.5">
-                <Activity className="w-4 h-4" />
-              </div>
-              <h2 className="text-sm font-semibold text-on-surface mb-1.5">
-                Port & Process Telemetry
-              </h2>
-              <p className="text-xs text-on-surface-variant leading-relaxed">
-                Keep track of local dev servers, active port allocations, and
-                connected background agents effortlessly.
               </p>
             </div>
           </div>

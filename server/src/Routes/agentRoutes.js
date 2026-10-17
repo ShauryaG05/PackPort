@@ -2,7 +2,120 @@ const express = require("express");
 const route = express.Router();
 const authMiddleware = require("../middleware/authMiddleware");
 
-// All agent routes are protected with authMiddleware
+const crypto = require("crypto");
+const User = require("../models/userModel");
+
+// Simple sliding window rate limiter for linking attempts: max 15 requests per 60 seconds per IP
+const linkAttempts = new Map();
+function rateLimitLink(req, res, next) {
+    const ip = req.ip || req.connection?.remoteAddress || "unknown";
+    const now = Date.now();
+    const windowMs = 60 * 1000;
+    const maxAttempts = 15;
+
+    let record = linkAttempts.get(ip);
+    if (!record || now - record.resetTime > windowMs) {
+        record = { count: 1, resetTime: now };
+        linkAttempts.set(ip, record);
+    } else {
+        record.count++;
+        if (record.count > maxAttempts) {
+            return res.status(429).json({
+                success: false,
+                message: "Too many linking attempts. Please wait a minute and try again."
+            });
+        }
+    }
+    next();
+}
+
+/**
+ * POST /agent/link
+ * Public verification endpoint for CLI and standalone agents.
+ * Validates agent code, issues device enrollment token, and authorizes linking.
+ */
+route.post("/link", rateLimitLink, async (req, res) => {
+    try {
+        const { agentCode, hostname, platform, arch } = req.body || {};
+        const trimmedCode = (agentCode || "").toString().trim();
+
+        // 1. Strict input validation
+        if (!trimmedCode || !/^[a-zA-Z0-9_-]{6,64}$/.test(trimmedCode)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid agent code format. Must be 6-64 alphanumeric characters."
+            });
+        }
+
+        // 2. Query database for associated user
+        const user = await User.findOne({ agentCode: trimmedCode });
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "Invalid or unrecognized agent code."
+            });
+        }
+
+        // 3. Issue cryptographically secure device enrollment token
+        const agentToken = crypto.randomBytes(32).toString("hex");
+
+        const deviceEntry = {
+            token: agentToken,
+            hostname: (hostname || "unknown").toString().slice(0, 100),
+            platform: (platform || "unknown").toString().slice(0, 50),
+            arch: (arch || "unknown").toString().slice(0, 50),
+            linkedAt: new Date(),
+            lastActiveAt: new Date()
+        };
+
+        await User.updateOne(
+            { _id: user._id },
+            {
+                $push: { agentTokens: deviceEntry },
+                $set: { agentLinkedAt: new Date() }
+            }
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: "Agent linked successfully",
+            agentCode: user.agentCode,
+            token: agentToken,
+            user: {
+                name: user.name
+            }
+        });
+    } catch (err) {
+        console.error("Agent linking error:", err);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error during agent linking"
+        });
+    }
+});
+
+// Alias for verification check
+route.post("/verify-code", rateLimitLink, async (req, res) => {
+    try {
+        const { agentCode } = req.body || {};
+        const trimmedCode = (agentCode || "").toString().trim();
+
+        if (!trimmedCode || !/^[a-zA-Z0-9_-]{6,64}$/.test(trimmedCode)) {
+            return res.status(400).json({ success: false, valid: false, message: "Invalid format." });
+        }
+
+        const user = await User.findOne({ agentCode: trimmedCode });
+        if (!user) {
+            return res.status(404).json({ success: false, valid: false, message: "Unrecognized agent code." });
+        }
+
+        return res.status(200).json({ success: true, valid: true });
+    } catch (err) {
+        return res.status(500).json({ success: false, valid: false, message: "Verification check error." });
+    }
+});
+
+// All routes below require authMiddleware
 route.use(authMiddleware);
 
 /**
@@ -96,7 +209,14 @@ function handleScan(lang) {
             }
 
             const targetEvent = `${lang}_scan`;
-            io.emit(targetEvent, user.agentCode);
+            const agentRoom = `agent:${user.agentCode}`;
+            const socketsInRoom = io.sockets.adapter.rooms.get(agentRoom);
+
+            if (socketsInRoom && socketsInRoom.size > 0) {
+                io.to(agentRoom).emit(targetEvent, user.agentCode);
+            } else {
+                io.emit(targetEvent, user.agentCode);
+            }
 
             return res.status(200).json({
                 success: true,
@@ -135,32 +255,55 @@ route.post("/scan/:language", (req, res, next) => {
     return res.status(400).json({ success: false, message: `Unsupported ecosystem '${lang}'` });
 });
 
+const PACKAGE_NAME_REGEX = /^(@[a-z0-9-~][a-z0-9-._~]*\/)?[a-z0-9-~][a-z0-9-._~]*$/i;
+
+
 route.post("/update/:pkgName", (req, res) => {
     const { language, packageName } = req.body || {};
     const pkg = packageName || req.params.pkgName;
-
-    console.log("Package to be upgraded:", pkg, language);
-
+    const lang = (language || "python").toLowerCase();
+    if (!pkg || !PACKAGE_NAME_REGEX.test(pkg)) {
+        return res.status(400).json({ success: false, message: "Invalid package name format" });
+    }
+    if (!["python", "node"].includes(lang)) {
+        return res.status(400).json({ success: false, message: "Unsupported language ecosystem" });
+    }
     const io = req.app.get("io");
-    const socketEvent = `update_${language || "python"}`;
+    const taskId = `task_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+    const payload = {
+        taskId,
+        agentCode: req.user?.agentCode,
+        packageName: pkg,
+        language: lang
+    };
+
+    const agentRoom = `agent:${req.user.agentCode}`;
+    const socketsInRoom = io?.sockets?.adapter?.rooms?.get(agentRoom);
+
     if (io) {
-        io.emit(socketEvent, {
-            agentCode: req.user?.agentCode,
-            packageName: pkg,
-            language: language || "python",
+        if (socketsInRoom && socketsInRoom.size > 0) {
+            io.to(agentRoom).emit("package_update", payload);
+            io.to(agentRoom).emit(`update_${lang}`, payload);
+        } else {
+            io.emit("package_update", payload);
+            io.emit(`update_${lang}`, payload);
+        }
+
+        // Notify user's dashboard room and global fallback
+        io.to(`user:${req.user.agentCode}`).emit("package_update_started", {
+            ...payload,
+            timestamp: new Date()
         });
         io.emit("package_update_started", {
-            agentCode: req.user?.agentCode,
-            packageName: pkg,
-            language: language || "python",
-            timestamp: new Date(),
+            ...payload,
+            timestamp: new Date()
         });
     }
+
     res.json({
         success: true,
-        message: `Upgrade initiated for ${pkg}`,
-        packageName: pkg,
-        language: language || "python",
+        taskId,
+        message: `Upgrade initiated for ${pkg}`
     });
 });
 

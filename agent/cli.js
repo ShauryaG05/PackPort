@@ -5,7 +5,7 @@ const path = require("node:path");
 
 const agentPath = path.join(__dirname, "agent.js");
 
-const child = spawn(process.execPath, [agentPath], {
+const child = spawn(process.execPath, [agentPath, ...process.argv.slice(2)], {
   stdio: "inherit",
   env: process.env
 });

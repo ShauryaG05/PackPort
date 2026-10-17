@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
+import { io } from "socket.io-client";
 import {
   Terminal,
   RefreshCw,
@@ -92,7 +93,7 @@ export default function PackagePage() {
   const backendUrl =
     import.meta.env.VITE_BACKEND_URL ||
     import.meta.env.VITE_URL ||
-    "http://localhost:5600";
+    (import.meta.env.PROD ? "https://packport.onrender.com" : "http://localhost:5600");
 
   // Fetch package data from server
   const fetchPackageData = useCallback(async () => {
@@ -178,6 +179,56 @@ export default function PackagePage() {
   useEffect(() => {
     fetchPackageData();
   }, [fetchPackageData]);
+
+  useEffect(() => {
+    const socket = io(backendUrl);
+
+    if (livePackages.agentCode) {
+      socket.emit("register_dashboard", { agentCode: livePackages.agentCode });
+    }
+
+    socket.on("scan_complete", (payload) => {
+      if (!payload?.agentCode || !livePackages.agentCode || payload.agentCode === livePackages.agentCode) {
+        if (!payload?.language || payload?.language === activeLangKey) {
+          fetchPackageData();
+        }
+      }
+    });
+
+    socket.on("package_update_finished", (payload) => {
+      if (!payload) return;
+      setActiveUpdates((prev) =>
+        prev.map((u) => {
+          if (u.id === payload.taskId || u.packageName === payload.packageName) {
+            return {
+              ...u,
+              progress: 100,
+              status: payload.success ? "completed" : "failed",
+              currentStep: payload.success
+                ? `Successfully upgraded ${payload.packageName || u.packageName}!`
+                : `Upgrade failed: ${payload.error || "Unknown error"}`,
+              logs: [
+                ...u.logs,
+                payload.stdout ? `[Output] ${payload.stdout.trim()}` : null,
+                payload.success
+                  ? `[${new Date().toLocaleTimeString()}] ✅ Agent confirmed update completion.`
+                  : `[${new Date().toLocaleTimeString()}] ❌ Agent reported failure: ${payload.error}`
+              ].filter(Boolean)
+            };
+          }
+          return u;
+        })
+      );
+
+      if (payload.success) {
+        setTimeout(() => fetchPackageData(), 1200);
+      }
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [backendUrl, livePackages.agentCode, activeLangKey, fetchPackageData]);
 
   // Trigger agent scan via backend
   async function triggerScan() {

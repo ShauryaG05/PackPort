@@ -18,7 +18,9 @@ const userSchema = new mongoose.Schema({
     },
     agentCode: {
         type: String,
-        required: true
+        required: true,
+        unique: true,
+        index: true
     },
     python_Packages: {
         outdated_packages: { type: mongoose.Schema.Types.Mixed, default: null },
@@ -33,6 +35,20 @@ const userSchema = new mongoose.Schema({
         outdated_packages: { type: mongoose.Schema.Types.Mixed, default: null },
         all_packages: { type: mongoose.Schema.Types.Mixed, default: null },
         lastScanned: { type: Date, default: null }
+    },
+    agentTokens: [
+        {
+            token: { type: String, required: true },
+            hostname: { type: String, default: "" },
+            platform: { type: String, default: "" },
+            arch: { type: String, default: "" },
+            linkedAt: { type: Date, default: Date.now },
+            lastActiveAt: { type: Date, default: Date.now }
+        }
+    ],
+    agentLinkedAt: {
+        type: Date,
+        default: null
     }
 
 

@@ -401,10 +401,10 @@ npm update
                 </span>
                 <div>
                   <p className="text-sm font-semibold text-white">
-                    Run the automated agent scan from your dashboard
+                    Link your local machine using your Agent Code
                   </p>
                   <p className="text-xs text-gray-400 mt-0.5">
-                    Navigate to your PackPort Dashboard and trigger the background agent scan.
+                    Copy your unique Agent Code from the Dashboard profile and pair your machine.
                   </p>
                 </div>
               </div>
@@ -417,7 +417,7 @@ npm update
                     <span>Terminal</span>
                   </span>
                   <button
-                    onClick={() => handleCopy("npx packport-agent sync", "agent-sync")}
+                    onClick={() => handleCopy("packport link <your-agent-code> && packport start", "agent-sync")}
                     className="flex items-center gap-1 hover:text-white transition-colors cursor-pointer"
                   >
                     {copiedId === "agent-sync" ? (
@@ -433,9 +433,11 @@ npm update
                     )}
                   </button>
                 </div>
-                <div className="p-4 font-mono text-xs text-emerald-400 select-all overflow-x-auto">
-                  <span className="text-gray-500 select-none mr-2">$</span>
-                  npx packport-agent sync
+                <div className="p-4 font-mono text-xs text-emerald-400 select-all overflow-x-auto space-y-1">
+                  <div><span className="text-gray-500 select-none mr-2"># 1. Link machine once</span></div>
+                  <div><span className="text-gray-500 select-none mr-2">$</span>packport link &lt;your-agent-code&gt;</div>
+                  <div className="pt-2"><span className="text-gray-500 select-none mr-2"># 2. Start telemetry daemon</span></div>
+                  <div><span className="text-gray-500 select-none mr-2">$</span>packport start</div>
                 </div>
               </div>
             </div>

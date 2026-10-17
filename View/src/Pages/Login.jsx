@@ -1,44 +1,58 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { PackPortIcon } from "../components/PackPortLogo";
-import { Eye, EyeOff, RefreshCw, ArrowLeft, CheckCircle2 } from "lucide-react";
-
-
+import { Eye, EyeOff, RefreshCw, ArrowLeft, AlertCircle } from "lucide-react";
 
 function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState("Input");
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
 
     async function loginHandler(e) {
         e.preventDefault();
-        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/login`, {
-            method: "POST",
-            headers: {
-                "content-type": "application/json"
-            },
-            credentials: "include",
-            body: JSON.stringify({
-                email: email,
-                password: password,
-            })
-        })
+        setIsSubmitting(true);
 
-        const data = await response.json();
-        console.log(data);
-        if (data.success) {
-            setLoading("Success");
-            console.log("Login successful")
+        // Brief delay allows the user to distinctly perceive the tactile press state & button spinner
+        await new Promise((resolve) => setTimeout(resolve, 250));
+        setLoading("Checking");
 
-        }
-        else if (!data.success) {
+        const backendUrl = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_URL || (import.meta.env.PROD ? "https://packport.onrender.com" : "http://localhost:5600");
+
+        try {
+            const response = await fetch(`${backendUrl}/auth/login`, {
+                method: "POST",
+                headers: {
+                    "content-type": "application/json"
+                },
+                credentials: "include",
+                body: JSON.stringify({
+                    email: email,
+                    password: password,
+                })
+            });
+
+            const data = await response.json();
+            console.log(data);
+
+            if (data.success) {
+                setLoading("Success");
+                console.log("Login successful");
+                navigate("/dashboard");
+            } else {
+                setErrorMessage(data.message || "Invalid credentials. Please try again.");
+                setLoading("Failed");
+                console.log("Login failed");
+            }
+        } catch (err) {
+            console.error("Login error:", err);
+            setErrorMessage("Could not connect to the server. Please check your network or try again.");
             setLoading("Failed");
-            console.log("Login failed")
-        }
-        else {
-            setLoading("Input");
+        } finally {
+            setIsSubmitting(false);
         }
     }
 
@@ -88,6 +102,7 @@ function Login() {
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         placeholder="Enter your email"
+                                        required
                                         className="w-full bg-background border border-outline focus:border-primary-fixed focus:ring-1 focus:ring-primary-fixed rounded-lg px-3 py-2 text-sm text-on-surface placeholder-[#484f58] outline-none transition-colors"
                                     />
                                 </div>
@@ -103,6 +118,7 @@ function Login() {
                                             value={password}
                                             onChange={(e) => setPassword(e.target.value)}
                                             placeholder="Enter your password"
+                                            required
                                             className="w-full bg-background border border-outline focus:border-primary-fixed focus:ring-1 focus:ring-primary-fixed rounded-lg pl-3 pr-9 py-2 text-sm text-on-surface placeholder-[#484f58] outline-none transition-colors"
                                         />
                                         <button
@@ -119,9 +135,17 @@ function Login() {
                                 {/* Login Submit Button */}
                                 <button
                                     type="submit"
-                                    className="w-full py-2 px-4 rounded-lg font-medium text-sm bg-primary hover:bg-primary-container text-white transition-colors cursor-pointer flex items-center justify-center gap-2 shadow-xs mt-2"
+                                    disabled={isSubmitting}
+                                    className="w-full py-2.5 px-4 rounded-lg font-medium text-sm bg-primary hover:bg-primary-container active:bg-[#1a56db] text-white transition-all duration-150 ease-out cursor-pointer active:scale-[0.98] active:translate-y-0.5 shadow-sm hover:shadow-md active:shadow-inner flex items-center justify-center gap-2 mt-2 select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:opacity-80 disabled:cursor-not-allowed disabled:transform-none"
                                 >
-                                    Login
+                                    {isSubmitting ? (
+                                        <>
+                                            <RefreshCw className="w-4 h-4 animate-spin text-white" />
+                                            <span>Signing in...</span>
+                                        </>
+                                    ) : (
+                                        <span>Login</span>
+                                    )}
                                 </button>
                             </form>
 
@@ -138,7 +162,7 @@ function Login() {
                                 <button
                                     type="button"
                                     onClick={() => navigate("/dashboard")}
-                                    className="w-full py-2 px-3 rounded-lg bg-background hover:bg-surface-variant border border-outline text-xs font-medium text-[#c9d1d9] transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                                    className="w-full py-2 px-3 rounded-lg bg-background hover:bg-surface-variant active:bg-surface active:scale-[0.98] active:translate-y-0.5 border border-outline text-xs font-medium text-[#c9d1d9] transition-all duration-150 ease-out flex items-center justify-center gap-2 cursor-pointer select-none"
                                 >
                                     <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
                                         <path
@@ -175,15 +199,25 @@ function Login() {
                         </div>
                     </>
                 ) : loading === "Success" ? (
-                    navigate("/dashboard")
+                    <div className="w-full bg-surface border border-primary rounded-xl p-8 flex flex-col items-center justify-center gap-3 shadow-xl text-center">
+                        <RefreshCw className="w-8 h-8 animate-spin text-secondary" />
+                        <h1 className="text-lg font-medium text-on-surface">Redirecting to Dashboard...</h1>
+                    </div>
                 ) : loading === "Failed" ? (
-                    <>
-                        <h1 className="text-xl font-medium text-on-surface">Login Failed</h1>
-                        <p className="text-xs text-on-surface-variant">Please check your credentials and try again</p>
-                        <div onClick={() => navigate("/auth/login")} className="w-full py-2 px-4 rounded-lg font-medium text-sm bg-primary hover:bg-primary-container text-white transition-colors cursor-pointer flex items-center justify-center gap-2 shadow-xs mt-2">
-                            Try Again
+                    <div className="w-full bg-surface border border-error/50 rounded-xl p-8 flex flex-col items-center justify-center gap-3 shadow-xl text-center">
+                        <div className="w-12 h-12 rounded-full bg-error/10 border border-error flex items-center justify-center text-error">
+                            <AlertCircle className="w-6 h-6" />
                         </div>
-                    </>
+                        <h1 className="text-lg font-medium text-on-surface">Login Failed</h1>
+                        <p className="text-xs text-on-surface-variant max-w-xs">{errorMessage || "Please check your credentials and try again."}</p>
+                        <button
+                            type="button"
+                            onClick={() => setLoading("Input")}
+                            className="w-full py-2.5 px-4 rounded-lg font-medium text-sm bg-primary hover:bg-primary-container active:bg-[#1a56db] active:scale-[0.98] active:translate-y-0.5 text-white transition-all duration-150 ease-out cursor-pointer flex items-center justify-center gap-2 shadow-sm hover:shadow-md active:shadow-inner mt-2 select-none"
+                        >
+                            Try Again
+                        </button>
+                    </div>
                 ) : null}
             </main>
 

@@ -46,7 +46,7 @@ export default function UserPage() {
     hasData: false,
   });
 
-  const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:5600";
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_URL || (import.meta.env.PROD ? "https://packport.onrender.com" : "http://localhost:5600");
 
   // Fetch user auth & live telemetry without hardcoded values
   const fetchData = useCallback(async () => {

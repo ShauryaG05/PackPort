@@ -39,15 +39,18 @@ router.post("/signup", async (req, res) => {
                         agentCode: code
                     })
                     const token = jwt.sign({ id: user._id, email: email }, process.env.JWT_SECRET, { expiresIn: "100h" })
-                    return res.cookie("accessToken", token, {
+                    const isProduction = process.env.NODE_ENV === "production";
+                    const cookieOptions = {
                         httpOnly: true,
-                        secure: process.env.NODE_ENV === "production",
-                        sameSite: "lax",
-                        maxAge: 24 * 60 * 60 * 1000
-                    }).status(200).json({
+                        secure: isProduction,
+                        sameSite: isProduction ? "none" : "lax",
+                        maxAge: 7 * 24 * 60 * 60 * 1000
+                    };
+                    return res.cookie("accessToken", token, cookieOptions).status(200).json({
                         success: true,
                         message: "User created successfully",
-                        user: { id: user._id, name: user.name, email: user.email }
+                        token,
+                        user: { id: user._id, name: user.name, email: user.email, agentCode: user.agentCode }
                     })
                 }
                 else {
@@ -85,14 +88,18 @@ router.post("/login", async (req, res) => {
             const isPasswordValid = await bcrypt.compare(password, user.password)
             if (isPasswordValid) {
                 const token = jwt.sign({ id: user._id, email: email }, process.env.JWT_SECRET, { expiresIn: "100h" })
-                res.cookie("accessToken", token, {
+                const isProduction = process.env.NODE_ENV === "production";
+                const cookieOptions = {
                     httpOnly: true,
-                    secure: process.env.NODE_ENV === "production",
-                    sameSite: "lax",
-                    maxAge: 24 * 60 * 60 * 1000
-                }).status(200).json({
+                    secure: isProduction,
+                    sameSite: isProduction ? "none" : "lax",
+                    maxAge: 7 * 24 * 60 * 60 * 1000
+                };
+                res.cookie("accessToken", token, cookieOptions).status(200).json({
                     success: true,
-                    message: "Login Successfull"
+                    message: "Login Successfull",
+                    token,
+                    user: { id: user._id, name: user.name, email: user.email, agentCode: user.agentCode }
                 })
             } else {
                 res.status(401).json({

@@ -4,7 +4,9 @@ require("dotenv").config();
 
 async function authMiddleware(req, res, next) {
     try {
-        const token = req.cookies?.accessToken;
+        const authHeader = req.headers.authorization;
+        const bearerToken = authHeader && authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
+        const token = req.cookies?.accessToken || bearerToken;
         if (!token) {
             return res.status(401).json({
                 success: false,

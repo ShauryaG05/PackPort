@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import PackPortLogo from "../components/PackPortLogo";
+import Navbar from "../components/Navbar";
 
 import docIconWebp from "../assets/docIcon.webp";
 import { ArrowDownToLine } from "lucide-react";
@@ -116,7 +117,7 @@ export default function Layout({ children }) {
 
     async function handleLogout() {
         try {
-            const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:5600";
+            const backendUrl = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_URL || (import.meta.env.PROD ? "https://packport.onrender.com" : "http://localhost:5600");
             const response = await fetch(`${backendUrl}/auth/logout`, {
                 method: "GET",
                 credentials: "include"
@@ -138,7 +139,7 @@ export default function Layout({ children }) {
         let isMounted = true;
         async function fetchUser() {
             try {
-                const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:5600";
+                const backendUrl = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_URL || (import.meta.env.PROD ? "https://packport.onrender.com" : "http://localhost:5600");
                 const res = await fetch(`${backendUrl}/auth/check`, {
                     method: "GET",
                     credentials: "include",
@@ -364,58 +365,13 @@ export default function Layout({ children }) {
             {/* RIGHT SIDE MAIN CONTAINER */}
             <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
                 {/* Top Navbar */}
-                <header className="h-16 shrink-0 bg-[#161b22] border-b border-outline px-4 md:px-8 flex items-center justify-between z-30">
-                    <div className="flex items-center gap-4">
-                        <button
-                            onClick={() => setSidebarOpen(true)}
-                            className="md:hidden p-2 rounded-lg text-gray-400 hover:text-white hover:bg-[#21262d] transition-colors"
-                            aria-label="Open sidebar"
-                        >
-                            <Menu size={20} />
-                        </button>
-
-                        {/* Ecosystem Quick Switcher Buttons */}
-                        <div className="flex items-center p-1 bg-[#0d1117] rounded-xl border border-outline shadow-inner gap-1">
-                            {ecosystemTabs.map((tab) => {
-                                const TabIcon = tab.icon;
-                                const isActive = location.pathname === tab.path;
-                                return (
-                                    <NavLink
-                                        key={tab.path}
-                                        to={tab.path}
-                                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${isActive
-                                            ? `${tab.activeClass} border shadow-xs`
-                                            : "text-gray-400 hover:text-white hover:bg-[#21262d] border border-transparent"
-                                            }`}
-                                    >
-                                        {typeof TabIcon === "string" ? (
-                                            <img
-                                                src={TabIcon}
-                                                alt={tab.name}
-                                                style={{ width: 14, height: 14 }}
-                                                className="object-contain shrink-0"
-                                            />
-                                        ) : TabIcon ? (
-                                            <TabIcon size={14} className="shrink-0" />
-                                        ) : null}
-                                        <span>{tab.name}</span>
-                                    </NavLink>
-                                );
-                            })}
-                        </div>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white">
-                            <Bell size={18} />
-                        </Button>
-                        <NavLink to="/user" title="User Telemetry Profile">
-                            <Button variant="ghost" size="icon" className={`hover:text-white ${location.pathname === "/user" ? "text-primary bg-primary/10" : "text-gray-400"}`}>
-                                <User size={18} />
-                            </Button>
-                        </NavLink>
-                    </div>
-                </header>
+                <Navbar
+                    isDashboard={true}
+                    onToggleSidebar={() => setSidebarOpen(true)}
+                    authenticated={true}
+                    user={user}
+                    onLogout={handleLogout}
+                />
 
                 {/* Dynamic Route Content Area */}
                 <main className="flex-1 overflow-y-auto bg-background p-4 md:p-8">

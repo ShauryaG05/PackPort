@@ -103,7 +103,7 @@ export default function Dashboard() {
   const [user, setUser] = useState(null);
   const [activeUpdates, setActiveUpdates] = useState([]);
 
-  const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:5600";
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_URL || (import.meta.env.PROD ? "https://packport.onrender.com" : "http://localhost:5600");
 
   // Telemetry state across all monitored ecosystems
   const [ecosystems, setEcosystems] = useState({
@@ -224,8 +224,10 @@ export default function Dashboard() {
 
     const socket = io(backendUrl);
     socket.on("scan_complete", (payload) => {
-      if (payload?.language) {
-        fetchTelemetry(payload.language);
+      if (!payload?.agentCode || !user?.agentCode || payload.agentCode === user.agentCode) {
+        if (payload?.language) {
+          fetchTelemetry(payload.language);
+        }
       }
     });
 

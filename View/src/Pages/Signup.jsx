@@ -88,8 +88,9 @@ function Signup() {
     async function handleSignup(e) {
         if (e) e.preventDefault();
         setPhase(2); // Loading/Wait stage
+        const backendUrl = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_URL || (import.meta.env.PROD ? "https://packport.onrender.com" : "http://localhost:5600");
         try {
-            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/signup`, {
+            const response = await fetch(`${backendUrl}/auth/signup`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -264,7 +265,7 @@ function Signup() {
                                 {/* Submit Button */}
                                 <button
                                     type="submit"
-                                    className="w-full py-2 px-4 rounded-lg font-medium text-sm bg-primary hover:bg-primary-container text-white transition-colors cursor-pointer flex items-center justify-center gap-2 shadow-xs mt-2"
+                                    className="w-full py-2.5 px-4 rounded-lg font-medium text-sm bg-primary hover:bg-primary-container active:bg-[#1a56db] text-white transition-all duration-150 ease-out cursor-pointer active:scale-[0.98] active:translate-y-0.5 shadow-sm hover:shadow-md active:shadow-inner flex items-center justify-center gap-2 mt-2 select-none"
                                 >
                                     Create account
                                 </button>
