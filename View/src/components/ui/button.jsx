@@ -47,14 +47,18 @@ function Button({
   asChild = false,
   render,
   children,
+  nativeButton,
   ...props
 }) {
   const effectiveRender = render || (asChild && React.isValidElement(children) ? children : undefined);
+  const isCustomElement = Boolean(effectiveRender && effectiveRender.type !== "button");
+  const computedNativeButton = nativeButton !== undefined ? nativeButton : (isCustomElement ? false : undefined);
 
   return (
     <ButtonPrimitive
       data-slot="button"
       render={effectiveRender}
+      nativeButton={computedNativeButton}
       className={cn(buttonVariants({ variant, size, className }))}
       {...props}
     >

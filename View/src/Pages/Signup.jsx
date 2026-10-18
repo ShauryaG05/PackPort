@@ -9,6 +9,7 @@ import {
     RefreshCw,
     ArrowLeft,
 } from "lucide-react";
+import { setAuthSession } from "../lib/auth";
 
 
 function SuccessVerification({ onRedirect }) {
@@ -105,6 +106,9 @@ function Signup() {
             console.log("Signup Response:", data);
 
             if (data.success) {
+                if (data.token) {
+                    setAuthSession(data.token, data.user);
+                }
                 console.log("Signup successful! User data:", data.user);
                 setPhase(3); // transition to success phase
             } else {

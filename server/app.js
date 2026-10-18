@@ -15,14 +15,27 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'http://localhost:3000',
+  'http://127.0.0.1:5173',
+  'https://pack-port-nine.vercel.app',
+  'https://pack-port-ivu59eor4-shauryagupta2006s-projects.vercel.app',
+  process.env.FrontEnd_URI
+].filter(Boolean);
+
 app.use(cors({
-  origin: [
-    'http://localhost:5173',
-    'https://pack-port-ivu59eor4-shauryagupta2006s-projects.vercel.app',
-    'https://pack-port-nine.vercel.app'  
-  ],
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-  credentials: true
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin) || (typeof origin === "string" && origin.endsWith('.vercel.app'))) {
+      callback(null, true);
+    } else {
+      callback(null, true);
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
 }));
 // Routes
 const authRoutes = require("./src/Routes/authRoutes");

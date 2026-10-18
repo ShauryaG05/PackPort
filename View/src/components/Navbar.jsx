@@ -29,6 +29,7 @@ import {
   HardDrive,
   Database
 } from "lucide-react";
+import { getAuthHeaders, clearAuthSession, setAuthSession } from "../lib/auth";
 
 // Genuine SVG Icon components for Ecosystems
 export function PythonIcon({ size = 18, className = "" }) {
@@ -136,6 +137,7 @@ export default function Navbar({
             (import.meta.env.PROD ? "https://packport.onrender.com" : "http://localhost:5600");
           const response = await fetch(`${backendUrl}/auth/check`, {
             method: "GET",
+            headers: getAuthHeaders(),
             credentials: "include",
           });
           const data = await response.json();
@@ -143,8 +145,12 @@ export default function Navbar({
             if (data.status) {
               setInternalAuth(true);
               if (propSetAuth) propSetAuth(true);
-              if (data.user) setInternalUser(data.user);
+              if (data.user) {
+                setInternalUser(data.user);
+                setAuthSession(undefined, data.user);
+              }
             } else {
+              clearAuthSession();
               setInternalAuth(false);
               if (propSetAuth) propSetAuth(false);
               setInternalUser(null);
@@ -152,6 +158,7 @@ export default function Navbar({
           }
         } catch {
           if (isMounted) {
+            clearAuthSession();
             setInternalAuth(false);
             if (propSetAuth) propSetAuth(false);
           }
@@ -176,20 +183,20 @@ export default function Navbar({
         import.meta.env.VITE_BACKEND_URL ||
         import.meta.env.VITE_URL ||
         (import.meta.env.PROD ? "https://packport.onrender.com" : "http://localhost:5600");
-      const response = await fetch(`${backendUrl}/auth/logout`, {
+      await fetch(`${backendUrl}/auth/logout`, {
         method: "GET",
+        headers: getAuthHeaders(),
         credentials: "include",
       });
-      const data = await response.json();
-      if (data.success) {
-        setInternalAuth(false);
-        if (propSetAuth) propSetAuth(false);
-        setInternalUser(null);
-        setActiveDropdown(null);
-        navigate("/");
-      }
     } catch (e) {
       console.error("Logout failed:", e);
+    } finally {
+      clearAuthSession();
+      setInternalAuth(false);
+      if (propSetAuth) propSetAuth(false);
+      setInternalUser(null);
+      setActiveDropdown(null);
+      navigate("/auth/login");
     }
   }
 

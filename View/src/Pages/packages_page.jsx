@@ -21,6 +21,7 @@ import {
   Zap,
 } from "lucide-react";
 import ActiveUpdateSection from "../components/ActiveUpdateSection.jsx";
+import { getAuthHeaders } from "../lib/auth";
 
 // Ecosystem metadata configuration
 const ECOSYSTEM_CONFIG = {
@@ -101,6 +102,7 @@ export default function PackagePage() {
     try {
       const res = await fetch(`${backendUrl}/agent/packages/${activeLangKey}`, {
         method: "GET",
+        headers: getAuthHeaders(),
         credentials: "include",
       });
 

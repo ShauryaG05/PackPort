@@ -5,6 +5,18 @@ const User = require("../models/userModel")
 const jwt = require("jsonwebtoken")
 const generateCode = require("../scripts/agentCode")
 
+const getCookieOptions = (req) => {
+    const isHttps = req.secure || req.headers["x-forwarded-proto"] === "https";
+    const isProduction = process.env.NODE_ENV === "production" || isHttps;
+    return {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: isProduction ? "none" : "lax",
+        path: "/",
+        maxAge: 7 * 24 * 60 * 60 * 1000
+    };
+};
+
 router.post("/signup", async (req, res) => {
 
     const { name, email, password } = req.body;
@@ -31,7 +43,6 @@ router.post("/signup", async (req, res) => {
 
                     const code = generateCode();
 
-
                     const user = await User.create({
                         name: name,
                         email: email,
@@ -39,13 +50,7 @@ router.post("/signup", async (req, res) => {
                         agentCode: code
                     })
                     const token = jwt.sign({ id: user._id, email: email }, process.env.JWT_SECRET, { expiresIn: "100h" })
-                    const isProduction = process.env.NODE_ENV === "production";
-                    const cookieOptions = {
-                        httpOnly: true,
-                        secure: isProduction,
-                        sameSite: isProduction ? "none" : "lax",
-                        maxAge: 7 * 24 * 60 * 60 * 1000
-                    };
+                    const cookieOptions = getCookieOptions(req);
                     return res.cookie("accessToken", token, cookieOptions).status(200).json({
                         success: true,
                         message: "User created successfully",
@@ -88,14 +93,8 @@ router.post("/login", async (req, res) => {
             const isPasswordValid = await bcrypt.compare(password, user.password)
             if (isPasswordValid) {
                 const token = jwt.sign({ id: user._id, email: email }, process.env.JWT_SECRET, { expiresIn: "100h" })
-                const isProduction = process.env.NODE_ENV === "production";
-                const cookieOptions = {
-                    httpOnly: true,
-                    secure: isProduction,
-                    sameSite: isProduction ? "none" : "lax",
-                    maxAge: 7 * 24 * 60 * 60 * 1000
-                };
-                res.cookie("accessToken", token, cookieOptions).status(200).json({
+                const cookieOptions = getCookieOptions(req);
+                return res.cookie("accessToken", token, cookieOptions).status(200).json({
                     success: true,
                     message: "Login Successfull",
                     token,
@@ -116,15 +115,22 @@ router.post("/login", async (req, res) => {
         })
 
     }
-    // res.json({message : "login route called"})
 })
 
 router.get("/check", async (req, res) => {
-    const token = req.cookies?.accessToken;
+    const authHeader = req.headers.authorization;
+    const bearerToken = authHeader && authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
+    const token = req.cookies?.accessToken || bearerToken;
     if (token) {
         try {
             const data = jwt.verify(token, process.env.JWT_SECRET);
             const user = await User.findOne({ email: data.email }).select("-password");
+            if (!user) {
+                return res.status(401).json({
+                    status: false,
+                    message: "User not found"
+                });
+            }
             return res.status(200).json({
                 status: true,
                 user
@@ -143,13 +149,19 @@ router.get("/check", async (req, res) => {
     }
 });
 
-router.get("/logout",(req,res)=>{
+router.get("/logout", (req, res) => {
+    const cookieOptions = getCookieOptions(req);
+    res.clearCookie("accessToken", {
+        httpOnly: true,
+        secure: cookieOptions.secure,
+        sameSite: cookieOptions.sameSite,
+        path: "/"
+    });
 
-    res.status(200).clearCookie("accessToken").json({
+    return res.status(200).json({
         success: true,
         message: "Logout Successfull"
-    })
-
-})
+    });
+});
 
 module.exports = router;

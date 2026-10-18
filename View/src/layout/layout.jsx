@@ -19,7 +19,10 @@ import {
     User,
     Settings,
     Bell,
+    RefreshCw,
 } from "lucide-react";
+
+import { getAuthHeaders, clearAuthSession, setAuthSession } from "../lib/auth";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -116,25 +119,23 @@ export default function Layout({ children }) {
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
     const [agentOnline, setAgentOnline] = useState(false);
+    const [authChecking, setAuthChecking] = useState(true);
 
     async function handleLogout() {
         try {
             const backendUrl = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_URL || (import.meta.env.PROD ? "https://packport.onrender.com" : "http://localhost:5600");
-            const response = await fetch(`${backendUrl}/auth/logout`, {
+            await fetch(`${backendUrl}/auth/logout`, {
                 method: "GET",
+                headers: getAuthHeaders(),
                 credentials: "include"
             });
-            const data = await response.json();
-
-            if (data.success) {
-                setUser(null);
-                setAgentOnline(false);
-                navigate("/");
-            } else {
-                alert("Logout Failed");
-            }
         } catch (error) {
             console.error("Logout error:", error);
+        } finally {
+            clearAuthSession();
+            setUser(null);
+            setAgentOnline(false);
+            navigate("/auth/login", { replace: true });
         }
     }
 
@@ -145,16 +146,28 @@ export default function Layout({ children }) {
                 const backendUrl = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_URL || (import.meta.env.PROD ? "https://packport.onrender.com" : "http://localhost:5600");
                 const res = await fetch(`${backendUrl}/auth/check`, {
                     method: "GET",
+                    headers: getAuthHeaders(),
                     credentials: "include",
                 });
                 const data = await res.json();
-                if (isMounted && data.user) {
+                if (isMounted && data.status && data.user) {
                     setUser(data.user);
+                    setAuthSession(undefined, data.user);
+                    setAuthChecking(false);
+                } else {
+                    if (isMounted) {
+                        clearAuthSession();
+                        setUser(null);
+                        setAuthChecking(false);
+                        navigate("/auth/login", { replace: true, state: { from: location.pathname } });
+                    }
+                    return;
                 }
 
                 // Initial agent status check
                 const statusRes = await fetch(`${backendUrl}/agent/status`, {
                     method: "GET",
+                    headers: getAuthHeaders(),
                     credentials: "include",
                 });
                 if (statusRes.ok) {
@@ -165,6 +178,12 @@ export default function Layout({ children }) {
                 }
             } catch (error) {
                 console.error("Failed to fetch user or agent status:", error);
+                if (isMounted) {
+                    clearAuthSession();
+                    setUser(null);
+                    setAuthChecking(false);
+                    navigate("/auth/login", { replace: true, state: { from: location.pathname } });
+                }
             }
         }
 
@@ -249,6 +268,25 @@ export default function Layout({ children }) {
             activeClass: "bg-purple-600/20 text-purple-400 border-purple-500/40 shadow-xs",
         },
     ];
+
+    if (authChecking) {
+        return (
+            <div className="min-h-screen bg-background flex flex-col items-center justify-center text-foreground font-sans">
+                <div className="relative mb-5 flex items-center justify-center">
+                    <div className="absolute -inset-2 rounded-2xl bg-[#238636]/15 blur-lg animate-pulse" />
+                    <PackPortLogo size={36} showBadge={false} />
+                </div>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground font-mono">
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#7bdb80]" />
+                    <span>Verifying session...</span>
+                </div>
+            </div>
+        );
+    }
+
+    if (!user) {
+        return null;
+    }
 
     return (
         <div className="flex h-screen w-full bg-background text-[#c9d1d9] overflow-hidden font-sans">
@@ -411,7 +449,7 @@ export default function Layout({ children }) {
                 <Navbar
                     isDashboard={true}
                     onToggleSidebar={() => setSidebarOpen(true)}
-                    authenticated={true}
+                    authenticated={Boolean(user)}
                     user={user}
                     onLogout={handleLogout}
                 />

@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
+import { getAuthHeaders } from "../lib/auth";
 import {
   RefreshCw,
   AlertTriangle,
@@ -119,6 +120,7 @@ export default function Dashboard() {
     try {
       const res = await fetch(`${backendUrl}/agent/packages/${lang}`, {
         method: "GET",
+        headers: getAuthHeaders(),
         credentials: "include",
       });
 
@@ -205,6 +207,7 @@ export default function Dashboard() {
       try {
         const userRes = await fetch(`${backendUrl}/auth/check`, {
           method: "GET",
+          headers: getAuthHeaders(),
           credentials: "include",
         });
         if (userRes.ok) {
@@ -217,6 +220,7 @@ export default function Dashboard() {
         // Fetch initial live agent connection status
         const statusRes = await fetch(`${backendUrl}/agent/status`, {
           method: "GET",
+          headers: getAuthHeaders(),
           credentials: "include",
         });
         if (statusRes.ok) {
@@ -279,8 +283,8 @@ export default function Dashboard() {
     setScanning(true);
     try {
       await Promise.all([
-        fetch(`${backendUrl}/agent/python_scan`, { method: "GET", credentials: "include" }),
-        fetch(`${backendUrl}/agent/node_scan`, { method: "GET", credentials: "include" }),
+        fetch(`${backendUrl}/agent/python_scan`, { method: "GET", credentials: "include", headers: getAuthHeaders() }),
+        fetch(`${backendUrl}/agent/node_scan`, { method: "GET", credentials: "include", headers: getAuthHeaders() }),
       ]);
 
       for (let i = 1; i <= 3; i++) {
@@ -331,7 +335,7 @@ export default function Dashboard() {
       const response = await fetch(`${backendUrl}/agent/update/${pkg.name}`, {
         method: "POST",
         credentials: "include",
-        headers: { "Content-Type": "application/json" },
+        headers: getAuthHeaders({ "Content-Type": "application/json" }),
         body: JSON.stringify({
           language: lang,
           packageName: pkg.name,

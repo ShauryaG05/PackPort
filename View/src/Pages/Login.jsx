@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { PackPortIcon } from "../components/PackPortLogo";
 import { Eye, EyeOff, RefreshCw, ArrowLeft, AlertCircle } from "lucide-react";
+import { setAuthSession } from "../lib/auth";
 
 function Login() {
     const [email, setEmail] = useState("");
@@ -39,6 +40,9 @@ function Login() {
             console.log(data);
 
             if (data.success) {
+                if (data.token) {
+                    setAuthSession(data.token, data.user);
+                }
                 setLoading("Success");
                 console.log("Login successful");
                 navigate("/dashboard");

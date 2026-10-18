@@ -11,6 +11,7 @@ import {
   Check,
   Copy,
 } from "lucide-react";
+import { getAuthHeaders, clearAuthSession, setAuthSession } from "../lib/auth";
 
 export default function Home() {
   const [copied, setCopied] = useState(false);
@@ -28,16 +29,20 @@ export default function Home() {
       const backendUrl = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_URL || (import.meta.env.PROD ? "https://packport.onrender.com" : "http://localhost:5600");
       const response = await fetch(`${backendUrl}/auth/check`, {
         method: "GET",
+        headers: getAuthHeaders(),
         credentials: "include",
       });
       const data = await response.json();
 
       if (data.status) {
         setAuthenticated(true);
+        if (data.user) setAuthSession(undefined, data.user);
       } else {
+        clearAuthSession();
         setAuthenticated(false);
       }
     } catch {
+      clearAuthSession();
       setAuthenticated(false);
     }
   }
