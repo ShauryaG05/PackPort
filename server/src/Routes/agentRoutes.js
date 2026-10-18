@@ -39,11 +39,11 @@ route.post("/link", rateLimitLink, async (req, res) => {
         const { agentCode, hostname, platform, arch } = req.body || {};
         const trimmedCode = (agentCode || "").toString().trim();
 
-        // 1. Strict input validation
-        if (!trimmedCode || !/^[a-zA-Z0-9_-]{6,64}$/.test(trimmedCode)) {
+        // 1. Input validation (supports alphanumeric & special characters)
+        if (!trimmedCode || !/^[a-zA-Z0-9_!@#$%^&*\/\.\-+=\~]{6,64}$/.test(trimmedCode)) {
             return res.status(400).json({
                 success: false,
-                message: "Invalid agent code format. Must be 6-64 alphanumeric characters."
+                message: "Invalid agent code format. Must be between 6 and 64 characters."
             });
         }
 
@@ -100,8 +100,8 @@ route.post("/verify-code", rateLimitLink, async (req, res) => {
         const { agentCode } = req.body || {};
         const trimmedCode = (agentCode || "").toString().trim();
 
-        if (!trimmedCode || !/^[a-zA-Z0-9_-]{6,64}$/.test(trimmedCode)) {
-            return res.status(400).json({ success: false, valid: false, message: "Invalid format." });
+        if (!trimmedCode || !/^[a-zA-Z0-9_!@#$%^&*\/\.\-+=\~]{6,64}$/.test(trimmedCode)) {
+            return res.status(400).json({ success: false, valid: false, message: "Invalid format. Must be between 6 and 64 characters." });
         }
 
         const user = await User.findOne({ agentCode: trimmedCode });

@@ -1,6 +1,6 @@
 {
   "name": "packport-cli",
-  "version": "1.2.0",
+  "version": "1.2.2",
   "description": "PackPort Agent",
   "main": "agent.js",
   "scripts": {

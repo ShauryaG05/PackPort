@@ -8,7 +8,7 @@ const { io } = require("socket.io-client");
 const configManager = require("./config");
 
 const PACKAGE_NAME_REGEX = /^(@[a-z0-9-~][a-z0-9-._~]*\/)?[a-z0-9-~][a-z0-9-._~]*$/i;
-const AGENT_CODE_REGEX = /^[a-zA-Z0-9_-]{6,64}$/;
+const AGENT_CODE_REGEX = /^[a-zA-Z0-9_!@#$%^&*\/\.\-+=\~]{6,64}$/;
 
 /**
  * Resolve target Backend URL:
@@ -100,12 +100,12 @@ async function handleLinkCommand(args, backendUrl) {
         }
     }
 
-    const trimmedCode = (codeInput || "").trim();
+    const trimmedCode = (codeInput || "").trim().replace(/^['"]+|['"]+$/g, "");
 
     // 3. Validate format before calling backend
     if (!trimmedCode || !AGENT_CODE_REGEX.test(trimmedCode)) {
         console.error("❌ Error: Invalid Agent Code format.");
-        console.error("Agent codes must be 6-64 alphanumeric characters (letters, numbers, underscores, hyphens).");
+        console.error("Agent codes must be between 6 and 64 characters.");
         process.exit(1);
     }
 
@@ -286,6 +286,11 @@ function startAgentDaemon(backendUrl) {
     console.log(`Target Backend: ${backendUrl}`);
     console.log(`Agent Identity: ${configManager.maskAgentCode(activeAgentCode)} (${os.hostname()})`);
     console.log(`Config File:    ${configManager.getConfigPath()}`);
+
+    // If backend was updated (e.g. via --backend), persist for subsequent runs
+    if (config.agentCode && backendUrl && config.backendUrl !== backendUrl) {
+        configManager.saveConfig({ backendUrl });
+    }
 
     const socket = io(backendUrl, {
         auth: {

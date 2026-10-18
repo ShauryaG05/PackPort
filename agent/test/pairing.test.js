@@ -87,12 +87,12 @@ async function runTests() {
                 req.on("data", chunk => body += chunk);
                 req.on("end", () => {
                     mockReceivedBody = JSON.parse(body);
-                    if (mockReceivedBody.agentCode === "validCode999") {
+                    if (mockReceivedBody.agentCode === "validCode999" || mockReceivedBody.agentCode === "ehi!EEPC1y") {
                         res.writeHead(200, { "Content-Type": "application/json" });
                         res.end(JSON.stringify({
                             success: true,
                             message: "Agent linked successfully",
-                            agentCode: "validCode999",
+                            agentCode: mockReceivedBody.agentCode,
                             token: "mockDeviceToken777",
                             user: { name: "Test User" }
                         }));
@@ -143,6 +143,17 @@ async function runTests() {
         });
         assert.strictEqual(configManager.loadConfig().agentCode, "validCode999", "Code should not be overwritten without --force");
         console.log("✅ Step 3B Passed: Safe rejection of re-link without --force.");
+
+        // Step 3B2: Linking with special character code (e.g. ehi!EEPC1y) should succeed with --force
+        await new Promise((resolve, reject) => {
+            execFile(process.execPath, [agentScript, "link", "ehi!EEPC1y", "--backend", mockBackendUrl, "--force"], (err, stdout, stderr) => {
+                if (err) return reject(new Error(`Special char link failed: ${stderr || err.message}`));
+                assert(stdout.includes("Successfully linked this machine"), "Should link special character code");
+                resolve();
+            });
+        });
+        assert.strictEqual(configManager.loadConfig().agentCode, "ehi!EEPC1y", "Special character agent code should be persisted");
+        console.log("✅ Step 3B2 Passed: Special character agent code (ehi!EEPC1y) linked and persisted.");
 
         // Step C: Linking with invalid code should fail and not overwrite
         await new Promise((resolve) => {

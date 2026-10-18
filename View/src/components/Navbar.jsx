@@ -231,7 +231,7 @@ export default function Navbar({
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-[#08090d]/90 backdrop-blur-xl border-b border-white/[0.08] select-none">
+    <header className="sticky top-0 z-40 w-full bg-[#08090d]/90 backdrop-blur-xl border-b border-white/8 select-none">
       <div
         ref={navContainerRef}
         onMouseLeave={handleMouseLeave}
@@ -244,7 +244,7 @@ export default function Navbar({
               <button
                 type="button"
                 onClick={onToggleSidebar}
-                className="md:hidden p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/[0.06] transition-colors cursor-pointer"
+                className="md:hidden p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/6 transition-colors cursor-pointer"
                 aria-label="Open sidebar"
               >
                 <Menu size={20} />
@@ -273,8 +273,8 @@ export default function Navbar({
               onClick={() => setActiveDropdown(activeDropdown === "runtimes" ? null : "runtimes")}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer ${
                 activeDropdown === "runtimes"
-                  ? "text-white bg-white/[0.08]"
-                  : "text-zinc-300 hover:text-white hover:bg-white/[0.04]"
+                  ? "text-white bg-white/8"
+                  : "text-zinc-300 hover:text-white hover:bg-white/4"
               }`}
               aria-expanded={activeDropdown === "runtimes"}
             >
@@ -297,8 +297,8 @@ export default function Navbar({
               onClick={() => setActiveDropdown(activeDropdown === "resources" ? null : "resources")}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer ${
                 activeDropdown === "resources"
-                  ? "text-white bg-white/[0.08]"
-                  : "text-zinc-300 hover:text-white hover:bg-white/[0.04]"
+                  ? "text-white bg-white/8"
+                  : "text-zinc-300 hover:text-white hover:bg-white/4"
               }`}
               aria-expanded={activeDropdown === "resources"}
             >
@@ -315,7 +315,7 @@ export default function Navbar({
           <Link
             to="/download"
             onMouseEnter={() => handleMouseEnter(null)}
-            className="px-3 py-1.5 rounded-lg text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.04] transition-all duration-150"
+            className="px-3 py-1.5 rounded-lg text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/4 transition-all duration-150"
           >
             Download
           </Link>
@@ -330,8 +330,8 @@ export default function Navbar({
               onClick={() => setActiveDropdown(activeDropdown === "account" ? null : "account")}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer ${
                 activeDropdown === "account"
-                  ? "text-white bg-white/[0.08]"
-                  : "text-zinc-300 hover:text-white hover:bg-white/[0.04]"
+                  ? "text-white bg-white/8"
+                  : "text-zinc-300 hover:text-white hover:bg-white/4"
               }`}
               aria-expanded={activeDropdown === "account"}
             >
@@ -350,7 +350,7 @@ export default function Navbar({
           {/* Docs Link */}
           <Link
             to="/docs/cli"
-            className="flex items-center gap-1.5 text-xs sm:text-sm font-medium text-zinc-300 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-white/[0.04]"
+            className="flex items-center gap-1.5 text-xs sm:text-sm font-medium text-zinc-300 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-white/4"
           >
             <BookOpen className="w-4 h-4 text-zinc-400" />
             <span>Docs</span>
@@ -371,7 +371,7 @@ export default function Navbar({
               {isDashboard && (
                 <button
                   type="button"
-                  className="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-white/[0.06] transition-colors relative"
+                  className="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-white/6 transition-colors relative"
                   title="Notifications"
                 >
                   <Bell size={17} />
@@ -381,12 +381,12 @@ export default function Navbar({
 
               <Link
                 to="/user"
-                className="flex items-center gap-2 text-xs sm:text-sm font-medium text-zinc-200 hover:text-white transition-colors px-2.5 py-1.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08]"
+                className="flex items-center gap-2 text-xs sm:text-sm font-medium text-zinc-200 hover:text-white transition-colors px-2.5 py-1.5 rounded-xl bg-white/4 hover:bg-white/8 border border-white/8"
               >
                 <div className="w-6 h-6 rounded-full bg-indigo-500/20 border border-indigo-500/40 text-[11px] font-bold text-indigo-400 flex items-center justify-center">
                   {currentUser?.name ? currentUser.name[0].toUpperCase() : "U"}
                 </div>
-                <span className="max-w-[110px] truncate">{currentUser?.name || "Profile"}</span>
+                <span className="max-w-27.5 truncate">{currentUser?.name || "Profile"}</span>
               </Link>
 
               {!isDashboard && (
@@ -421,7 +421,7 @@ export default function Navbar({
           ) : (
             <Link
               to="/user"
-              className="flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs font-medium text-zinc-200 bg-white/[0.06] border border-white/[0.08]"
+              className="flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs font-medium text-zinc-200 bg-white/6 border border-white/8"
             >
               <div className="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 text-[10px] font-bold flex items-center justify-center">
                 {currentUser?.name ? currentUser.name[0].toUpperCase() : "U"}
@@ -431,7 +431,7 @@ export default function Navbar({
 
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-white/[0.06] transition-colors cursor-pointer"
+            className="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-white/6 transition-colors cursor-pointer"
             aria-label="Toggle Navigation Menu"
           >
             {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
@@ -451,13 +451,13 @@ export default function Navbar({
               onMouseLeave={handleMouseLeave}
               className={`absolute left-1/2 -translate-x-1/2 top-full mt-2 w-[94vw] ${
                 isDashboard ? "max-w-4xl" : "max-w-5xl"
-              } bg-[#0c0d12]/95 backdrop-blur-2xl border border-white/[0.1] rounded-2xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] p-6 z-50 overflow-hidden text-left`}
+              } bg-[#0c0d12]/95 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] p-6 z-50 overflow-hidden text-left`}
             >
               {/* Invisible top hover bridge */}
               <div className="absolute -top-3 left-0 right-0 h-3" />
 
               {/* Subtle top reflection line */}
-              <div className="absolute top-0 inset-x-8 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+              <div className="absolute top-0 inset-x-8 h-px bg-linear-to-r from-transparent via-white/20 to-transparent" />
 
               {/* 1. RUNTIMES DROPDOWN */}
               {activeDropdown === "runtimes" && (
@@ -797,7 +797,7 @@ export default function Navbar({
 
                   <div className="col-span-4">
                     {isAuth ? (
-                      <div className="h-full bg-[#12131b] border border-white/[0.08] rounded-xl p-4.5 flex flex-col justify-between">
+                      <div className="h-full bg-[#12131b] border border-white/8 rounded-xl p-4.5 flex flex-col justify-between">
                         <div>
                           <div className="flex items-center gap-3 mb-3">
                             <div className="w-10 h-10 rounded-full bg-indigo-500/20 border border-indigo-500/40 text-indigo-400 font-bold text-sm flex items-center justify-center">
@@ -830,7 +830,7 @@ export default function Navbar({
                           </Link>
                           <Link
                             to="/user"
-                            className="py-2 px-3 rounded-lg bg-white/[0.06] hover:bg-white/[0.1] text-zinc-300 hover:text-white border border-white/[0.08] text-xs font-medium transition-colors"
+                            className="py-2 px-3 rounded-lg bg-white/6 hover:bg-white/10 text-zinc-300 hover:text-white border border-white/8 text-xs font-medium transition-colors"
                           >
                             Profile
                           </Link>
@@ -864,10 +864,10 @@ export default function Navbar({
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
-            className="lg:hidden bg-[#0c0d12] border-b border-white/[0.1] px-4 py-6 overflow-y-auto max-h-[85vh] space-y-4"
+            className="lg:hidden bg-[#0c0d12] border-b border-white/10 px-4 py-6 overflow-y-auto max-h-[85vh] space-y-4"
           >
             {/* Mobile Runtimes Section */}
-            <div className="border-b border-white/[0.06] pb-3">
+            <div className="border-b border-white/6 pb-3">
               <button
                 onClick={() => toggleMobileSubmenu("runtimes")}
                 className="w-full flex items-center justify-between py-2 text-sm font-semibold text-zinc-200"
@@ -910,7 +910,7 @@ export default function Navbar({
             </div>
 
             {/* Mobile Resources Section */}
-            <div className="border-b border-white/[0.06] pb-3">
+            <div className="border-b border-white/6 pb-3">
               <button
                 onClick={() => toggleMobileSubmenu("resources")}
                 className="w-full flex items-center justify-between py-2 text-sm font-semibold text-zinc-200"
@@ -947,7 +947,7 @@ export default function Navbar({
             </div>
 
             {/* Mobile Download Direct Link */}
-            <div className="border-b border-white/[0.06] pb-3">
+            <div className="border-b border-white/6 pb-3">
               <Link
                 to="/download"
                 className="block py-2 text-sm font-semibold text-zinc-200 hover:text-white"
@@ -968,7 +968,7 @@ export default function Navbar({
                   </Link>
                   <Link
                     to="/user"
-                    className="w-full py-2.5 px-4 rounded-xl text-center text-sm font-medium text-zinc-300 bg-white/[0.06] border border-white/[0.08]"
+                    className="w-full py-2.5 px-4 rounded-xl text-center text-sm font-medium text-zinc-300 bg-white/6 border border-white/8"
                   >
                     Telemetry Profile
                   </Link>
@@ -989,7 +989,7 @@ export default function Navbar({
                   </Link>
                   <Link
                     to="/docs/cli"
-                    className="w-full py-2.5 px-4 rounded-xl text-center text-sm font-medium text-zinc-300 bg-white/[0.06] border border-white/[0.08]"
+                    className="w-full py-2.5 px-4 rounded-xl text-center text-sm font-medium text-zinc-300 bg-white/6 border border-white/8"
                   >
                     Read Docs
                   </Link>
@@ -1004,11 +1004,11 @@ export default function Navbar({
 }
 
 // Sub-component for individual dropdown items with glowing icons
-function DropdownItem({ to, icon, iconBg = "bg-white/[0.06] border-white/10", title, desc }) {
+function DropdownItem({ to, icon, iconBg = "bg-white/6 border-white/10", title, desc }) {
   return (
     <Link
       to={to}
-      className="flex items-start gap-3 p-2 rounded-xl hover:bg-white/[0.06] border border-transparent hover:border-white/[0.06] transition-all text-left group cursor-pointer"
+      className="flex items-start gap-3 p-2 rounded-xl hover:bg-white/6 border border-transparent hover:border-white/6 transition-all text-left group cursor-pointer"
     >
       <div
         className={`w-7 h-7 rounded-lg ${iconBg} border flex items-center justify-center shrink-0 mt-0.5 transition-transform group-hover:scale-105`}
@@ -1041,9 +1041,9 @@ function FeaturedPreviewCard({
   secondaryBtnLink = "/download",
 }) {
   return (
-    <div className="h-full bg-[#12131b] border border-white/[0.08] rounded-xl p-4 flex flex-col justify-between shrink-0">
+    <div className="h-full bg-[#12131b] border border-white/8 rounded-xl p-4 flex flex-col justify-between shrink-0">
       {/* Top Visual Mockup Interface (Replicating the reference screenshot) */}
-      <div className="relative w-full h-32 rounded-lg bg-[#08090e] border border-white/[0.06] p-3 overflow-hidden flex flex-col justify-between">
+      <div className="relative w-full h-32 rounded-lg bg-[#08090e] border border-white/6 p-3 overflow-hidden flex flex-col justify-between">
         {/* Subtle grid dots in background */}
         <div
           className="absolute inset-0 opacity-20 pointer-events-none"
@@ -1056,10 +1056,10 @@ function FeaturedPreviewCard({
 
         {/* Top interactive elements */}
         <div className="flex items-center justify-end gap-1.5 relative z-10">
-          <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/[0.06] text-zinc-400 border border-white/[0.08] font-mono">
+          <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/6 text-zinc-400 border border-white/8 font-mono">
             Open ▾
           </span>
-          <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/[0.06] text-zinc-400 border border-white/[0.08] font-mono">
+          <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/6 text-zinc-400 border border-white/8 font-mono">
             P0 ▾
           </span>
         </div>
@@ -1073,7 +1073,7 @@ function FeaturedPreviewCard({
           </div>
 
           {/* Wireframe Card with handles */}
-          <div className="relative w-full py-1.5 px-2 rounded-md bg-white/[0.04] border border-dashed border-white/20 flex items-center justify-between">
+          <div className="relative w-full py-1.5 px-2 rounded-md bg-white/4 border border-dashed border-white/20 flex items-center justify-between">
             <span className="text-[10px] text-zinc-300 font-mono font-medium">
               runtime: Node.js • v20.x
             </span>
@@ -1083,7 +1083,7 @@ function FeaturedPreviewCard({
           </div>
 
           {/* Tag 2 (Sky-blue Pill Badge) */}
-          <div className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-[#38bdf8]/20 border border-[#38bdf8]/40 text-[#38bdf8] text-[9px] font-mono font-medium mt-1">
+          <div className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-tertiary/20 border border-tertiary/40 text-tertiary text-[9px] font-mono font-medium mt-1">
             <span>{tag2}</span>
           </div>
         </div>
@@ -1100,11 +1100,11 @@ function FeaturedPreviewCard({
       </div>
 
       {/* Action Buttons */}
-      <div className="flex items-center gap-2 mt-4 pt-2 border-t border-white/[0.06]">
+      <div className="flex items-center gap-2 mt-4 pt-2 border-t border-white/6">
         {secondaryBtnLink && (
           <Link
             to={secondaryBtnLink}
-            className="flex-1 text-center py-1.5 px-2.5 rounded-lg bg-white/[0.06] hover:bg-white/[0.1] text-zinc-300 hover:text-white border border-white/[0.08] text-xs font-medium transition-colors"
+            className="flex-1 text-center py-1.5 px-2.5 rounded-lg bg-white/6 hover:bg-white/10 text-zinc-300 hover:text-white border border-white/8 text-xs font-medium transition-colors"
           >
             {secondaryBtnText}
           </Link>

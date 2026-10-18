@@ -189,7 +189,7 @@ export default function UserPage() {
 
   const handleCopyPairCommand = () => {
     if (user?.agentCode) {
-      navigator.clipboard.writeText(`packport link ${user.agentCode} && packport start`);
+      navigator.clipboard.writeText(`packport link "${user.agentCode}" --backend ${backendUrl} && packport start`);
       setCopiedCmd(true);
       setTimeout(() => setCopiedCmd(false), 2000);
     }
@@ -322,11 +322,11 @@ export default function UserPage() {
               <div className="space-y-2 text-xs">
                 <div className="flex justify-between items-center text-gray-400">
                   <span>Name:</span>
-                  <span className="text-white font-medium truncate max-w-[180px]">{user?.name || "Developer"}</span>
+                  <span className="text-white font-medium truncate max-w-45">{user?.name || "Developer"}</span>
                 </div>
                 <div className="flex justify-between items-center text-gray-400">
                   <span>Email:</span>
-                  <span className="text-white font-mono truncate max-w-[180px]">{user?.email || "—"}</span>
+                  <span className="text-white font-mono truncate max-w-45">{user?.email || "—"}</span>
                 </div>
                 <div className="flex justify-between items-center text-gray-400">
                   <span>Member Since:</span>
@@ -359,7 +359,7 @@ export default function UserPage() {
               <div className="flex items-center gap-2 min-w-0">
                 <span className="text-gray-500 select-none">$</span>
                 <span className="text-emerald-400 truncate">
-                  packport link {user?.agentCode || "<your-agent-code>"} && packport start
+                  packport link &quot;{user?.agentCode || "<your-agent-code>"}&quot; --backend {backendUrl} && packport start
                 </span>
               </div>
               <Button

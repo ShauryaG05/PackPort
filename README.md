@@ -241,10 +241,13 @@ FrontEnd_URI=http://localhost:5173
 ```env
 VITE_BACKEND_URL=http://localhost:5600
 ```
-
-### Agent Configuration (`agent/.env`)
+### Agent Configuration (`agent/.env` or CLI `--backend`)
 ```env
-BACKEND_URI=http://localhost:5600
+# Production (Default):
+BACKEND_URI=https://packport.onrender.com
+
+# Local Development:
+# BACKEND_URI=http://localhost:5600
 ```
 
 ---
