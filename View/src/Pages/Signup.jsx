@@ -12,12 +12,9 @@ import {
 
 
 function SuccessVerification({ onRedirect }) {
-    const [countdown, setCountdown] = useState(5);
-    const navigate = useNavigate();
-
+    const [countdown, setCountdown] = useState(3);
 
     useEffect(() => {
-        checkUser()
         if (countdown <= 0) {
             onRedirect();
             return;
@@ -26,8 +23,6 @@ function SuccessVerification({ onRedirect }) {
             setCountdown((prev) => prev - 1);
         }, 1000);
         return () => clearTimeout(timer);
-
-
     }, [countdown, onRedirect]);
 
     return (
@@ -37,10 +32,10 @@ function SuccessVerification({ onRedirect }) {
             </div>
             <div>
                 <h2 className="text-lg font-semibold text-on-surface">Account Created Successfully</h2>
-                <p className="text-xs text-on-surface-variant mt-1">Your PackPort workspace is ready.</p>
+                <p className="text-xs text-on-surface-variant mt-1">Download the PackPort Agent to connect your machine.</p>
             </div>
             <div className="w-full bg-background border border-outline rounded-lg py-2.5 px-4 text-xs text-on-surface-variant flex items-center justify-between">
-                <span>Redirecting to Dashboard</span>
+                <span>Redirecting to Download Page</span>
                 <span className="font-semibold text-tertiary">{countdown}s</span>
             </div>
             <button
@@ -338,7 +333,7 @@ function Signup() {
                         <p className="text-xs text-on-surface-variant">Setting up your workspace and credentials</p>
                     </div>
                 ) : phase === 3 ? (
-                    <SuccessVerification onRedirect={() => navigate("/dashboard")} />
+                    <SuccessVerification onRedirect={() => navigate("/download")} />
                 ) : phase === 4 ? (
                     <div className="w-full bg-surface border border-error/50 rounded-xl p-8 flex flex-col items-center justify-center gap-3 shadow-xl text-center">
                         <div className="w-12 h-12 rounded-full bg-error/10 border border-error flex items-center justify-center text-error">
