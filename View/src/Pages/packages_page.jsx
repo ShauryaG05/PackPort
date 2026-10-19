@@ -240,6 +240,7 @@ export default function PackagePage() {
     try {
       const response = await fetch(`${backendUrl}${config.syncEndpoint}`, {
         method: "GET",
+        headers: getAuthHeaders(),
         credentials: "include",
       });
 
@@ -297,7 +298,7 @@ export default function PackagePage() {
       const response = await fetch(`${backendUrl}/agent/update/${pkg.name}`, {
         method: "POST",
         credentials: "include",
-        headers: { "Content-Type": "application/json" },
+        headers: getAuthHeaders({ "Content-Type": "application/json" }),
         body: JSON.stringify({
           language: activeLangKey,
           packageName: pkg.name,

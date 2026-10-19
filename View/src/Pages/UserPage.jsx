@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { getAuthHeaders } from "../lib/auth";
 
 export default function UserPage() {
   const [loading, setLoading] = useState(true);
@@ -58,6 +59,7 @@ export default function UserPage() {
       // 1. Fetch User Profile
       const authRes = await fetch(`${backendUrl}/auth/check`, {
         method: "GET",
+        headers: getAuthHeaders(),
         credentials: "include",
       });
 
@@ -71,6 +73,7 @@ export default function UserPage() {
       // 2. Fetch Live Agent Connection Status
       const statusRes = await fetch(`${backendUrl}/agent/status`, {
         method: "GET",
+        headers: getAuthHeaders(),
         credentials: "include",
       });
 
@@ -87,6 +90,7 @@ export default function UserPage() {
       // 3. Fetch Packages & Runtime Telemetry
       const pkgRes = await fetch(`${backendUrl}/agent/packages`, {
         method: "GET",
+        headers: getAuthHeaders(),
         credentials: "include",
       });
 

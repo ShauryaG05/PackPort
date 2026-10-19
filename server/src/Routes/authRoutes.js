@@ -49,14 +49,16 @@ router.post("/signup", async (req, res) => {
                         password: hassedPassword,
                         agentCode: code
                     })
-                    const token = jwt.sign({ id: user._id, email: email }, process.env.JWT_SECRET, { expiresIn: "100h" })
+                    const token = jwt.sign({ id: user._id, email: email }, process.env.JWT_SECRET, { expiresIn: "100h" });
                     const cookieOptions = getCookieOptions(req);
-                    return res.cookie("accessToken", token, cookieOptions).status(200).json({
+                    res.cookie("accessToken", token, cookieOptions);
+                    res.cookie("packport_session", "active", { ...cookieOptions, httpOnly: false });
+                    return res.status(200).json({
                         success: true,
                         message: "User created successfully",
                         token,
                         user: { id: user._id, name: user.name, email: user.email, agentCode: user.agentCode }
-                    })
+                    });
                 }
                 else {
                     res.status(400).json({
@@ -94,12 +96,14 @@ router.post("/login", async (req, res) => {
             if (isPasswordValid) {
                 const token = jwt.sign({ id: user._id, email: email }, process.env.JWT_SECRET, { expiresIn: "100h" })
                 const cookieOptions = getCookieOptions(req);
-                return res.cookie("accessToken", token, cookieOptions).status(200).json({
+                res.cookie("accessToken", token, cookieOptions);
+                res.cookie("packport_session", "active", { ...cookieOptions, httpOnly: false });
+                return res.status(200).json({
                     success: true,
                     message: "Login Successfull",
                     token,
                     user: { id: user._id, name: user.name, email: user.email, agentCode: user.agentCode }
-                })
+                });
             } else {
                 res.status(401).json({
                     success: false,
@@ -150,12 +154,20 @@ router.get("/check", async (req, res) => {
 });
 
 router.get("/logout", (req, res) => {
-    const cookieOptions = getCookieOptions(req);
-    res.clearCookie("accessToken", {
-        httpOnly: true,
-        secure: cookieOptions.secure,
-        sameSite: cookieOptions.sameSite,
-        path: "/"
+    const clearVariants = [
+        { path: "/", httpOnly: true, secure: true, sameSite: "none" },
+        { path: "/", httpOnly: true, secure: false, sameSite: "lax" },
+        { path: "/", httpOnly: true, secure: true, sameSite: "lax" },
+        { path: "/auth", httpOnly: true, secure: true, sameSite: "none" },
+        { path: "/auth", httpOnly: true, secure: false, sameSite: "lax" },
+        { path: "/auth", httpOnly: true, secure: true, sameSite: "lax" },
+        { path: "/" },
+        { path: "/auth" },
+    ];
+
+    clearVariants.forEach((opt) => {
+        res.clearCookie("accessToken", opt);
+        res.clearCookie("packport_session", { ...opt, httpOnly: false });
     });
 
     return res.status(200).json({
