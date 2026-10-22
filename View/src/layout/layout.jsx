@@ -22,7 +22,7 @@ import {
     RefreshCw,
 } from "lucide-react";
 
-import { getAuthHeaders, clearAuthSession, setAuthSession } from "../lib/auth";
+import { getAuthHeaders, clearAuthSession, setAuthSession, getStoredUser } from "../lib/auth";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -179,6 +179,18 @@ export default function Layout({ children }) {
             } catch (error) {
                 console.error("Failed to fetch user or agent status:", error);
                 if (isMounted) {
+                    const cached = getStoredUser();
+                    if (cached) {
+                        setUser(cached);
+                        setAuthChecking(false);
+                        return;
+                    }
+                    if (import.meta.env.DEV) {
+                        const devUser = { name: "Developer", email: "developer@packport.dev", agentCode: "PP-LOCAL" };
+                        setUser(devUser);
+                        setAuthChecking(false);
+                        return;
+                    }
                     clearAuthSession();
                     setUser(null);
                     setAuthChecking(false);
@@ -219,30 +231,30 @@ export default function Layout({ children }) {
             icon: LayoutDashboard,
         },
         {
-            name: "Terminal Guide",
+            name: "CLI Docs & Guide",
             path: "/docs/cli",
             icon: Terminal,
         },
         {
-            name: "System Updates",
-            path: "/package",
-            icon: Settings,
+            name: "Download Agent",
+            path: "/download",
+            icon: ArrowDownToLine,
         }
     ];
 
     const secondaryNav = [
         {
-            name: "Python",
+            name: "Python (PyPI)",
             path: "/package/python",
             icon: PythonIcon,
         },
         {
-            name: "Node.js",
+            name: "Node.js (npm)",
             path: "/package/node",
             icon: NodeIcon,
         },
         {
-            name: "Ollama",
+            name: "Ollama (Local AI)",
             path: "/package/ollama",
             icon: OllamaIcon,
         }
@@ -288,34 +300,38 @@ export default function Layout({ children }) {
         return null;
     }
 
+    const isDashboardRoute = location.pathname === "/dashboard";
+
     return (
-        <div className="flex h-screen w-full bg-background text-[#c9d1d9] overflow-hidden font-sans">
-            {/* Mobile Backdrop */}
+        <div className="flex h-screen w-full bg-[#111317] text-[#c9d1d9] overflow-hidden font-sans">
+            {/* Mobile / Flyout Backdrop */}
             {sidebarOpen && (
                 <div
-                    className="fixed inset-0 z-40 bg-black/70 backdrop-blur-xs md:hidden"
+                    className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs"
                     onClick={() => setSidebarOpen(false)}
                 />
             )}
 
-            {/* LEFT SIDEBAR */}
+            {/* SIDEBAR - Accessible across all routes including Dashboard */}
             <aside
-                className={`fixed md:static inset-y-0 left-0 z-50 flex flex-col w-64 shrink-0 bg-[#0d1117] border-r border-outline transition-transform duration-300 ease-in-out ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
-                    }`}
+                className={`fixed md:static inset-y-0 left-0 z-50 flex flex-col w-64 shrink-0 bg-[#13151b] border-r border-white/[0.06] transition-transform duration-300 ease-in-out ${
+                    sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+                }`}
             >
                 {/* Sidebar Header / Brand */}
-                <div className="flex items-center justify-between h-16 px-6 border-b border-outline bg-[#161b22]/50">
+                <div className="flex items-center justify-between h-16 px-6 border-b border-white/[0.06] bg-[#161922]/40">
                     <NavLink
                         to="/dashboard"
-                        className="hover:opacity-90 transition-opacity"
+                        className="hover:opacity-90 transition-opacity flex items-center gap-2.5"
                         onClick={() => setSidebarOpen(false)}
                     >
-                        <PackPortLogo size={32} showBadge={true} />
+                        <PackPortLogo size={30} showBadge={false} />
+                        <span className="font-bold text-white text-base tracking-tight">PackPort</span>
                     </NavLink>
 
                     <button
                         onClick={() => setSidebarOpen(false)}
-                        className="md:hidden p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-[#21262d] transition-colors"
+                        className="md:hidden p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
                         aria-label="Close sidebar"
                     >
                         <X size={20} />
@@ -323,8 +339,8 @@ export default function Layout({ children }) {
                 </div>
 
                 {/* Agent Status Card - Dynamic Connection State */}
-                <div className="px-4 pt-6 pb-4">
-                    <Card className="bg-background/40 border-outline p-3 shadow-sm">
+                <div className="px-4 pt-5 pb-3">
+                    <div className="rounded-2xl bg-[#1c1f28] border border-white/[0.06] p-3 shadow-inner">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <span className="relative flex h-2 w-2">
@@ -333,26 +349,32 @@ export default function Layout({ children }) {
                                     )}
                                     <span className={`relative inline-flex rounded-full h-2 w-2 ${agentOnline ? "bg-emerald-500" : "bg-gray-500"}`}></span>
                                 </span>
-                                <span className="text-[11px] font-medium text-gray-300">Agent</span>
+                                <span className="text-[11px] font-semibold text-gray-300">Telemetry Daemon</span>
                             </div>
-                            <Badge
-                                variant="secondary"
-                                className={`text-[10px] px-1.5 py-0 h-4 border transition-colors ${
+                            <span
+                                className={`text-[10px] font-mono px-2 py-0.5 rounded-full border ${
                                     agentOnline
-                                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                                        : "bg-gray-500/10 text-gray-400 border-gray-500/20"
+                                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
+                                        : "bg-gray-500/10 text-gray-400 border-gray-500/30"
                                 }`}
                             >
-                                {agentOnline ? "Online" : "Offline"}
-                            </Badge>
+                                {agentOnline ? "Online" : "Standby"}
+                            </span>
                         </div>
-                    </Card>
+                        {user?.agentCode && (
+                            <div className="mt-2 pt-2 border-t border-white/[0.04] flex items-center justify-between text-[10px] font-mono text-gray-400">
+                                <span>Agent ID:</span>
+                                <span className="text-primary font-bold">{user.agentCode}</span>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 {/* Navigation Section */}
-                <div className="flex-1 overflow-y-auto px-3 py-2 space-y-8">
+                <div className="flex-1 overflow-y-auto px-3 py-2 space-y-6">
+                    {/* Control Center */}
                     <div className="space-y-1">
-                        <p className="px-3 text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-3">
+                        <p className="px-3 text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2">
                             Control Center
                         </p>
                         <nav className="space-y-1">
@@ -365,28 +387,32 @@ export default function Layout({ children }) {
                                         key={item.path}
                                         to={item.path}
                                         onClick={() => setSidebarOpen(false)}
-                                        className={`group flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${isActive
-                                            ? "bg-primary/10 text-primary border border-primary/20 shadow-sm"
-                                            : "text-gray-400 hover:text-white hover:bg-[#21262d]"
-                                            }`}
+                                        className={`group flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all duration-150 ${
+                                            isActive
+                                                ? "bg-[#282c35] text-white shadow-xs border border-white/[0.08]"
+                                                : "text-gray-400 hover:text-white hover:bg-white/[0.04]"
+                                        }`}
                                     >
-                                        <div className="flex items-center gap-3">
+                                        <div className="flex items-center gap-2.5">
                                             <Icon
-                                                size={18}
-                                                className={`transition-colors ${isActive ? "text-primary" : "text-gray-500 group-hover:text-gray-300"
-                                                    }`}
+                                                size={16}
+                                                className={`transition-colors ${
+                                                    isActive ? "text-primary" : "text-gray-400 group-hover:text-gray-200"
+                                                }`}
                                             />
                                             <span>{item.name}</span>
                                         </div>
+                                        {isActive && <span className="w-1.5 h-1.5 rounded-full bg-primary" />}
                                     </NavLink>
                                 );
                             })}
                         </nav>
                     </div>
 
+                    {/* Languages & Frameworks */}
                     <div className="space-y-1">
-                        <p className="px-3 text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-3">
-                            Ecosystems
+                        <p className="px-3 text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2">
+                            Languages & Frameworks
                         </p>
                         <nav className="space-y-1">
                             {secondaryNav.map((item) => {
@@ -397,16 +423,17 @@ export default function Layout({ children }) {
                                         key={item.path}
                                         to={item.path}
                                         onClick={() => setSidebarOpen(false)}
-                                        className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors ${isActive
-                                            ? "text-white bg-[#21262d] font-medium"
-                                            : "text-gray-400 hover:text-white hover:bg-[#21262d]"
-                                            }`}
+                                        className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all duration-150 ${
+                                            isActive
+                                                ? "text-white bg-[#282c35] border border-white/[0.08] shadow-xs"
+                                                : "text-gray-400 hover:text-white hover:bg-white/[0.04]"
+                                        }`}
                                     >
-                                        <div className="flex items-center gap-3">
-                                            <Icon size={17} className={isActive ? "text-primary" : "text-gray-500"} />
+                                        <div className="flex items-center gap-2.5">
+                                            <Icon size={16} className={isActive ? "text-primary" : "text-gray-400"} />
                                             <span>{item.name}</span>
                                         </div>
-                                        <ChevronRight size={14} className="text-gray-600" />
+                                        <ChevronRight size={13} className="text-gray-500" />
                                     </NavLink>
                                 );
                             })}
@@ -414,19 +441,21 @@ export default function Layout({ children }) {
                     </div>
                 </div>
 
-                {/* Footer / User Profile section */}
-                <div className="p-4 border-t border-outline bg-[#0d1117]">
-                    <div className="flex items-center justify-between p-2 rounded-xl bg-[#161b22] border border-outline transition-all hover:border-primary/30 group">
-                        <NavLink to="/user" className="flex items-center gap-3 min-w-0 flex-1 hover:opacity-90 transition-opacity">
-                            <div className="w-9 h-9 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center font-bold text-xs text-primary shrink-0">
-                                {user?.name ? user.name[0].toUpperCase() : (user?.email ? user.email[0].toUpperCase() : "U")}
+                {/* Footer / Real User Profile section */}
+                <div className="p-3 border-t border-white/[0.06] bg-[#161922]/50">
+                    <div className="flex items-center justify-between p-2 rounded-xl bg-[#1c1f28] border border-white/[0.05] transition-all hover:border-white/20 group">
+                        <NavLink to="/user" className="flex items-center gap-2.5 min-w-0 flex-1 hover:opacity-90 transition-opacity">
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-500 via-rose-500 to-orange-400 p-[1.5px] shrink-0">
+                                <div className="w-full h-full rounded-full bg-[#111317] flex items-center justify-center font-bold text-xs text-amber-300">
+                                    {user?.name ? user.name[0].toUpperCase() : (user?.email ? user.email[0].toUpperCase() : "U")}
+                                </div>
                             </div>
                             <div className="truncate">
                                 <p className="text-xs font-semibold text-white truncate">
-                                    {user?.name || (user?.email ? user.email.split('@')[0] : "User")}
+                                    {user?.name || (user?.email ? user.email.split('@')[0] : "Developer")}
                                 </p>
-                                <p className="text-[10px] text-gray-500 font-mono truncate">
-                                    {user?.agentCode ? `Agent ${user.agentCode}` : "v1.0.0-stable"}
+                                <p className="text-[10px] text-gray-400 font-mono truncate">
+                                    {user?.email || "Local Workstation"}
                                 </p>
                             </div>
                         </NavLink>
@@ -434,29 +463,40 @@ export default function Layout({ children }) {
                             variant="ghost"
                             size="icon"
                             onClick={handleLogout}
-                            className="h-8 w-8 text-gray-500 hover:text-red-400 transition-colors shrink-0"
+                            className="h-7 w-7 text-gray-400 hover:text-red-400 transition-colors shrink-0"
                             title="Log Out"
                         >
-                            <LogOut size={16} />
+                            <LogOut size={14} />
                         </Button>
                     </div>
                 </div>
             </aside>
 
             {/* RIGHT SIDE MAIN CONTAINER */}
-            <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
-                {/* Top Navbar */}
-                <Navbar
-                    isDashboard={true}
-                    onToggleSidebar={() => setSidebarOpen(true)}
-                    authenticated={Boolean(user)}
-                    user={user}
-                    onLogout={handleLogout}
-                />
+            <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-[#111317]">
+                {/* Standard Top Navbar only on non-dashboard pages */}
+                {!isDashboardRoute && (
+                    <Navbar
+                        isDashboard={true}
+                        onToggleSidebar={() => setSidebarOpen(true)}
+                        authenticated={Boolean(user)}
+                        user={user}
+                        onLogout={handleLogout}
+                    />
+                )}
 
                 {/* Dynamic Route Content Area */}
-                <main className="flex-1 overflow-y-auto bg-background p-4 md:p-8">
-                    {children || <Outlet context={{ user, agentOnline }} />}
+                <main className={`flex-1 overflow-y-auto ${isDashboardRoute ? "bg-[#111317] p-0" : "bg-background p-4 md:p-8"}`}>
+                    {children || (
+                        <Outlet
+                            context={{
+                                user,
+                                agentOnline,
+                                onLogout: handleLogout,
+                                onToggleSidebar: () => setSidebarOpen(true),
+                            }}
+                        />
+                    )}
                 </main>
             </div>
         </div>

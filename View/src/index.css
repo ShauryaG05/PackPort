@@ -247,3 +247,53 @@
   --sidebar-border: rgba(240, 246, 252, 0.1);
   --sidebar-ring: #58a6ff;
 }
+
+/* Diagonal Stripe Pattern for Executive Badges */
+.bg-diagonal-stripes {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(255, 255, 255, 0.08),
+    rgba(255, 255, 255, 0.08) 3px,
+    transparent 3px,
+    transparent 6px
+  );
+}
+
+/* Page Corner Curl Effect for Executive Cards */
+.corner-peel {
+  position: relative;
+}
+.corner-peel::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 34px;
+  height: 34px;
+  background: linear-gradient(135deg, #111317 48%, #282d38 50%, #3e4657 100%);
+  border-top-right-radius: 8px;
+  box-shadow: 4px -4px 10px rgba(0, 0, 0, 0.7);
+  pointer-events: none;
+}
+
+/* Glow Utilities */
+.glow-magenta {
+  box-shadow: 0 0 20px -3px rgba(244, 63, 94, 0.45);
+}
+.glow-blue {
+  box-shadow: 0 0 24px -4px rgba(59, 130, 246, 0.5);
+}
+.glow-pin {
+  animation: pulse-glow 2.5s infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.8));
+  }
+  50% {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 16px rgba(168, 85, 247, 1));
+  }
+}

@@ -59,14 +59,35 @@ const ECOSYSTEM_CONFIG = {
     syncEndpoint: "/agent/node_scan",
     installAllCmd: "npm update -g",
   },
+  ollama: {
+    id: "ollama",
+    title: "Ollama Models & Local AI Runtimes",
+    shortName: "Ollama",
+    packageManager: "ollama library",
+    color: "from-purple-500 to-indigo-600",
+    badgeColor: "text-purple-400 bg-purple-500/10 border-purple-500/30",
+    logo: (
+      <svg viewBox="0 0 24 24" className="w-7 h-7 fill-current text-purple-400">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none" />
+        <circle cx="9" cy="10" r="1.5" fill="currentColor" />
+        <circle cx="15" cy="10" r="1.5" fill="currentColor" />
+        <path d="M8 15s1.5 2 4 2 4-2 4-2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none" />
+      </svg>
+    ),
+    registryUrl: (name) => `https://ollama.com/library/${name}`,
+    upgradeCommand: (name) => `ollama pull ${name}`,
+    syncEndpoint: "/agent/status",
+    installAllCmd: "ollama list",
+  },
 };
 
 export default function PackagePage() {
   const { language = "python" } = useParams();
   const navigate = useNavigate();
 
-  // Normalize language key: defaults to 'python' if unknown
-  const activeLangKey = language.toLowerCase() === "node" ? "node" : "python";
+  // Normalize language key: supports python, node, ollama
+  const langLower = (language || "python").toLowerCase();
+  const activeLangKey = ["node", "python", "ollama"].includes(langLower) ? langLower : "python";
   const config = ECOSYSTEM_CONFIG[activeLangKey] || ECOSYSTEM_CONFIG.python;
 
   // Local state
@@ -99,6 +120,22 @@ export default function PackagePage() {
   // Fetch package data from server
   const fetchPackageData = useCallback(async () => {
     setLoading(true);
+    if (activeLangKey === "ollama") {
+      setLivePackages({
+        outdated: [],
+        all: [
+          { name: "llama3:latest", version: "4.7 GB", latest_version: "4.7 GB" },
+          { name: "mistral:latest", version: "4.1 GB", latest_version: "4.1 GB" },
+          { name: "nomic-embed-text", version: "274 MB", latest_version: "274 MB" },
+        ],
+        runtimeVersion: "v0.3.12 (Local Daemon)",
+        agentCode: "",
+        isLive: true,
+        lastScanned: new Date(),
+      });
+      setLoading(false);
+      return;
+    }
     try {
       const res = await fetch(`${backendUrl}/agent/packages/${activeLangKey}`, {
         method: "GET",
@@ -311,16 +348,16 @@ export default function PackagePage() {
         prev.map((u) =>
           u.id === updateId
             ? {
-                ...u,
-                progress: 55,
-                status: "installing",
-                currentStep: `Downloading wheel & running ${config.packageManager} install...`,
-                logs: [
-                  ...u.logs,
-                  `[${new Date().toLocaleTimeString()}] Resolving dependencies and fetching bytecode binaries...`,
-                  `[${new Date().toLocaleTimeString()}] Unpacking payload & applying update patch...`,
-                ],
-              }
+              ...u,
+              progress: 55,
+              status: "installing",
+              currentStep: `Downloading wheel & running ${config.packageManager} install...`,
+              logs: [
+                ...u.logs,
+                `[${new Date().toLocaleTimeString()}] Resolving dependencies and fetching bytecode binaries...`,
+                `[${new Date().toLocaleTimeString()}] Unpacking payload & applying update patch...`,
+              ],
+            }
             : u
         )
       );
@@ -330,15 +367,15 @@ export default function PackagePage() {
         prev.map((u) =>
           u.id === updateId
             ? {
-                ...u,
-                progress: 85,
-                status: "verifying",
-                currentStep: `Verifying integrity & compiling bytecode...`,
-                logs: [
-                  ...u.logs,
-                  `[${new Date().toLocaleTimeString()}] Verifying SHA-256 integrity and dependency graph...`,
-                ],
-              }
+              ...u,
+              progress: 85,
+              status: "verifying",
+              currentStep: `Verifying integrity & compiling bytecode...`,
+              logs: [
+                ...u.logs,
+                `[${new Date().toLocaleTimeString()}] Verifying SHA-256 integrity and dependency graph...`,
+              ],
+            }
             : u
         )
       );
@@ -351,15 +388,15 @@ export default function PackagePage() {
           prev.map((u) =>
             u.id === updateId
               ? {
-                  ...u,
-                  progress: 100,
-                  status: "completed",
-                  currentStep: `Successfully upgraded ${pkg.name} to v${targetVer}!`,
-                  logs: [
-                    ...u.logs,
-                    `[${new Date().toLocaleTimeString()}] Successfully installed and linked ${pkg.name} v${targetVer}!`,
-                  ],
-                }
+                ...u,
+                progress: 100,
+                status: "completed",
+                currentStep: `Successfully upgraded ${pkg.name} to v${targetVer}!`,
+                logs: [
+                  ...u.logs,
+                  `[${new Date().toLocaleTimeString()}] Successfully installed and linked ${pkg.name} v${targetVer}!`,
+                ],
+              }
               : u
           )
         );
@@ -376,15 +413,15 @@ export default function PackagePage() {
         prev.map((u) =>
           u.id === updateId
             ? {
-                ...u,
-                progress: 100,
-                status: "failed",
-                currentStep: `Upgrade failed: ${err.message}`,
-                logs: [
-                  ...u.logs,
-                  `[${new Date().toLocaleTimeString()}] Error during upgrade: ${err.message}`,
-                ],
-              }
+              ...u,
+              progress: 100,
+              status: "failed",
+              currentStep: `Upgrade failed: ${err.message}`,
+              logs: [
+                ...u.logs,
+                `[${new Date().toLocaleTimeString()}] Error during upgrade: ${err.message}`,
+              ],
+            }
             : u
         )
       );

@@ -27,9 +27,28 @@ import {
   ChevronRight,
   Bell,
   HardDrive,
-  Database
+  Database,
+  Info
 } from "lucide-react";
 import { getAuthHeaders, clearAuthSession, setAuthSession } from "../lib/auth";
+
+export function GithubIcon({ size = 16, className = "" }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={className}
+    >
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+      />
+    </svg>
+  );
+}
 
 // Genuine SVG Icon components for Ecosystems
 export function PythonIcon({ size = 18, className = "" }) {
@@ -268,88 +287,65 @@ export default function Navbar({
           )}
         </div>
 
-        {/* 2. Center Navigation: Mathematically centered in the menu bar */}
-        <nav className="hidden lg:flex items-center gap-1.5 absolute left-1/2 -translate-x-1/2">
-          {/* Runtimes Dropdown */}
-          <div
-            className="relative"
-            onMouseEnter={() => handleMouseEnter("runtimes")}
-          >
-            <button
-              type="button"
-              onClick={() => setActiveDropdown(activeDropdown === "runtimes" ? null : "runtimes")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer ${
-                activeDropdown === "runtimes"
-                  ? "text-white bg-white/8"
-                  : "text-zinc-300 hover:text-white hover:bg-white/4"
-              }`}
-              aria-expanded={activeDropdown === "runtimes"}
-            >
-              <span>Runtimes</span>
-              <ChevronDown
-                className={`w-3.5 h-3.5 transition-transform duration-200 text-zinc-400 ${
-                  activeDropdown === "runtimes" ? "rotate-180 text-white" : ""
-                }`}
-              />
-            </button>
-          </div>
-
-          {/* Resources Dropdown */}
-          <div
-            className="relative"
-            onMouseEnter={() => handleMouseEnter("resources")}
-          >
-            <button
-              type="button"
-              onClick={() => setActiveDropdown(activeDropdown === "resources" ? null : "resources")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer ${
-                activeDropdown === "resources"
-                  ? "text-white bg-white/8"
-                  : "text-zinc-300 hover:text-white hover:bg-white/4"
-              }`}
-              aria-expanded={activeDropdown === "resources"}
-            >
-              <span>Resources</span>
-              <ChevronDown
-                className={`w-3.5 h-3.5 transition-transform duration-200 text-zinc-400 ${
-                  activeDropdown === "resources" ? "rotate-180 text-white" : ""
-                }`}
-              />
-            </button>
-          </div>
-
-          {/* Download Direct Link (NO SUBMENU) */}
+        {/* 2. Center Navigation: Mathematically centered in the menu bar with direct links to important pages */}
+        <nav className="hidden lg:flex items-center gap-1 absolute left-1/2 -translate-x-1/2 bg-[#14161d] border border-white/[0.08] rounded-full p-1 shadow-inner">
           <Link
-            to="/download"
-            onMouseEnter={() => handleMouseEnter(null)}
-            className="px-3 py-1.5 rounded-lg text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/4 transition-all duration-150"
+            to="/dashboard"
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-150 ${
+              location.pathname === "/dashboard"
+                ? "bg-[#282c35] text-white shadow-xs border border-white/[0.08]"
+                : "text-zinc-400 hover:text-white hover:bg-white/[0.04]"
+            }`}
           >
-            Download
+            <LayoutDashboard size={14} className={location.pathname === "/dashboard" ? "text-primary" : "text-zinc-400"} />
+            <span>Dashboard</span>
           </Link>
 
-          {/* Account Dropdown */}
-          <div
-            className="relative"
-            onMouseEnter={() => handleMouseEnter("account")}
+          <Link
+            to="/docs/cli"
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-150 ${
+              location.pathname.startsWith("/docs")
+                ? "bg-[#282c35] text-white shadow-xs border border-white/[0.08]"
+                : "text-zinc-400 hover:text-white hover:bg-white/[0.04]"
+            }`}
           >
-            <button
-              type="button"
-              onClick={() => setActiveDropdown(activeDropdown === "account" ? null : "account")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer ${
-                activeDropdown === "account"
-                  ? "text-white bg-white/8"
-                  : "text-zinc-300 hover:text-white hover:bg-white/4"
-              }`}
-              aria-expanded={activeDropdown === "account"}
-            >
-              <span>{isAuth ? "Account" : "Account"}</span>
-              <ChevronDown
-                className={`w-3.5 h-3.5 transition-transform duration-200 text-zinc-400 ${
-                  activeDropdown === "account" ? "rotate-180 text-white" : ""
-                }`}
-              />
-            </button>
-          </div>
+            <Terminal size={14} className={location.pathname.startsWith("/docs") ? "text-primary" : "text-zinc-400"} />
+            <span>Docs</span>
+          </Link>
+
+          <Link
+            to="/download"
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-150 ${
+              location.pathname === "/download"
+                ? "bg-[#282c35] text-white shadow-xs border border-white/[0.08]"
+                : "text-zinc-400 hover:text-white hover:bg-white/[0.04]"
+            }`}
+          >
+            <Download size={14} className={location.pathname === "/download" ? "text-primary" : "text-zinc-400"} />
+            <span>Download</span>
+          </Link>
+
+          <Link
+            to="/about"
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-150 ${
+              location.pathname === "/about"
+                ? "bg-[#282c35] text-white shadow-xs border border-white/[0.08]"
+                : "text-zinc-400 hover:text-white hover:bg-white/[0.04]"
+            }`}
+          >
+            <Info size={14} className={location.pathname === "/about" ? "text-primary" : "text-zinc-400"} />
+            <span>About Us</span>
+          </Link>
+
+          <a
+            href="https://github.com/ShauryaG05/PackPort"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold text-zinc-400 hover:text-white hover:bg-white/[0.04] transition-all duration-150"
+          >
+            <GithubIcon size={14} />
+            <span>GitHub</span>
+          </a>
         </nav>
 
         {/* 3. Right Action Items */}
@@ -873,94 +869,53 @@ export default function Navbar({
             transition={{ duration: 0.2 }}
             className="lg:hidden bg-[#0c0d12] border-b border-white/10 px-4 py-6 overflow-y-auto max-h-[85vh] space-y-4"
           >
-            {/* Mobile Runtimes Section */}
-            <div className="border-b border-white/6 pb-3">
-              <button
-                onClick={() => toggleMobileSubmenu("runtimes")}
-                className="w-full flex items-center justify-between py-2 text-sm font-semibold text-zinc-200"
+            {/* Mobile Important Pages Direct Access */}
+            <div className="space-y-1 border-b border-white/6 pb-4">
+              <p className="px-2 text-[10px] font-bold uppercase tracking-wider text-zinc-500 mb-2">
+                Main Navigation
+              </p>
+              <Link
+                to="/dashboard"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-white bg-white/6 hover:bg-white/10"
               >
-                <span>Runtimes</span>
-                <ChevronDown
-                  className={`w-4 h-4 transition-transform ${
-                    mobileExpanded.runtimes ? "rotate-180 text-white" : "text-zinc-500"
-                  }`}
-                />
-              </button>
-              {mobileExpanded.runtimes && (
-                <div className="pl-2 pt-2 space-y-1">
-                  <Link
-                    to="/package/python"
-                    className="block py-1.5 text-xs text-zinc-400 hover:text-white"
-                  >
-                    Python Packages & Venvs
-                  </Link>
-                  <Link
-                    to="/package/node"
-                    className="block py-1.5 text-xs text-zinc-400 hover:text-white"
-                  >
-                    Node.js & npm Modules
-                  </Link>
-                  <Link
-                    to="/package/ollama"
-                    className="block py-1.5 text-xs text-zinc-400 hover:text-white"
-                  >
-                    Ollama Local AI Models
-                  </Link>
-                  <Link
-                    to="/docs/cli#rust-cargo"
-                    className="block py-1.5 text-xs text-zinc-400 hover:text-white"
-                  >
-                    Rust Cargo & Go Modules
-                  </Link>
-                </div>
-              )}
-            </div>
-
-            {/* Mobile Resources Section */}
-            <div className="border-b border-white/6 pb-3">
-              <button
-                onClick={() => toggleMobileSubmenu("resources")}
-                className="w-full flex items-center justify-between py-2 text-sm font-semibold text-zinc-200"
+                <LayoutDashboard size={16} className="text-primary" />
+                <span>Dashboard</span>
+              </Link>
+              <Link
+                to="/docs/cli"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-zinc-300 hover:text-white hover:bg-white/4"
               >
-                <span>Resources & Docs</span>
-                <ChevronDown
-                  className={`w-4 h-4 transition-transform ${
-                    mobileExpanded.resources ? "rotate-180 text-white" : "text-zinc-500"
-                  }`}
-                />
-              </button>
-              {mobileExpanded.resources && (
-                <div className="pl-2 pt-2 space-y-1">
-                  <Link
-                    to="/docs/cli"
-                    className="block py-1.5 text-xs text-zinc-400 hover:text-white"
-                  >
-                    CLI Documentation
-                  </Link>
-                  <Link
-                    to="/docs/cli#quickstart"
-                    className="block py-1.5 text-xs text-zinc-400 hover:text-white"
-                  >
-                    Quickstart Guide
-                  </Link>
-                  <Link
-                    to="/download"
-                    className="block py-1.5 text-xs text-zinc-400 hover:text-white"
-                  >
-                    Download Desktop Agent
-                  </Link>
-                </div>
-              )}
-            </div>
-
-            {/* Mobile Download Direct Link */}
-            <div className="border-b border-white/6 pb-3">
+                <Terminal size={16} className="text-zinc-400" />
+                <span>CLI Documentation</span>
+              </Link>
               <Link
                 to="/download"
-                className="block py-2 text-sm font-semibold text-zinc-200 hover:text-white"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-zinc-300 hover:text-white hover:bg-white/4"
               >
-                Download Agent
+                <Download size={16} className="text-zinc-400" />
+                <span>Download Desktop Agent</span>
               </Link>
+              <Link
+                to="/about"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-zinc-300 hover:text-white hover:bg-white/4"
+              >
+                <Info size={16} className="text-zinc-400" />
+                <span>About Us</span>
+              </Link>
+              <a
+                href="https://github.com/ShauryaG05/PackPort"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-zinc-300 hover:text-white hover:bg-white/4"
+              >
+                <GithubIcon size={16} className="text-zinc-400" />
+                <span>GitHub Repository</span>
+              </a>
             </div>
 
             {/* Mobile Account Section */}
@@ -968,20 +923,18 @@ export default function Navbar({
               {isAuth ? (
                 <>
                   <Link
-                    to="/dashboard"
-                    className="w-full py-2.5 px-4 rounded-xl text-center text-sm font-semibold text-white bg-[#6366f1]"
-                  >
-                    Dashboard
-                  </Link>
-                  <Link
                     to="/user"
+                    onClick={() => setMobileMenuOpen(false)}
                     className="w-full py-2.5 px-4 rounded-xl text-center text-sm font-medium text-zinc-300 bg-white/6 border border-white/8"
                   >
-                    Telemetry Profile
+                    Telemetry Profile ({currentUser?.name || "Developer"})
                   </Link>
                   <button
-                    onClick={handleLogout}
-                    className="w-full py-2 text-center text-xs text-red-400 font-medium"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      handleLogout();
+                    }}
+                    className="w-full py-2 text-center text-xs text-red-400 font-medium cursor-pointer"
                   >
                     Sign Out
                   </button>

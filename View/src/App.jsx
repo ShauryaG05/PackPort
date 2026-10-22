@@ -10,6 +10,7 @@ import Test from "./Pages/test.jsx";
 import Download from "./Pages/Download.jsx";
 import NotFound from "./Pages/NotFound.jsx";
 import UserPage from "./Pages/UserPage.jsx";
+import AboutUs from "./Pages/AboutUs.jsx";
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
         {/* Main App Routes with Sidebar Layout */}
         <Route element={<Layout />}>
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/about" element={<AboutUs />} />
           <Route path="/package/:language" element={<Packages />} />
           <Route path="/package" element={<Navigate to="/package/python" replace />} />
           <Route path="/user" element={<UserPage />} />
