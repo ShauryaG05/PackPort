@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import ActiveUpdateSection from "../components/ActiveUpdateSection";
 import PackPortLogo from "../components/PackPortLogo";
+import { PythonIcon, NodeIcon, OllamaIcon } from "../components/Navbar";
 
 function GithubIcon({ size = 14, className = "" }) {
   return (
@@ -556,7 +557,7 @@ export default function Dashboard() {
       {/* ─────────────────────────────────────────────────────────────
           1. TOP NAVIGATION BAR (Important Pages Directly In Main Nav)
       ───────────────────────────────────────────────────────────── */}
-      <header className="w-full px-6 py-4 flex items-center justify-between border-b border-white/[0.06] bg-[#111317]/90 backdrop-blur-md sticky top-0 z-40">
+      <header className="w-full px-6 py-4 flex items-center justify-between border-b border-white/6 bg-[#111317]/90 backdrop-blur-md sticky top-0 z-40">
         {/* Left: Mobile Drawer Trigger & Workstation Telemetry Context */}
         <div className="flex items-center gap-3">
           {outletCtx.onToggleSidebar && (
@@ -585,28 +586,28 @@ export default function Dashboard() {
         </div>
 
         {/* Center: Floating Capsule Pill Navigation to Important Pages */}
-        <nav className="hidden md:flex items-center bg-[#1c1f26] border border-white/[0.08] rounded-full p-1 shadow-inner gap-1">
+        <nav className="hidden md:flex items-center bg-[#1c1f26] border border-white/8 rounded-full p-1 shadow-inner gap-1">
           <Link
             to="/dashboard"
-            className="px-4 py-1.5 rounded-full text-xs font-semibold bg-[#282c35] text-white shadow-xs border border-white/[0.08] transition-all"
+            className="px-4 py-1.5 rounded-full text-xs font-semibold bg-[#282c35] text-white shadow-xs border border-white/8 transition-all"
           >
             Dashboard
           </Link>
           <Link
             to="/docs/cli"
-            className="px-4 py-1.5 rounded-full text-xs font-medium text-gray-400 hover:text-white hover:bg-white/[0.04] transition-all"
+            className="px-4 py-1.5 rounded-full text-xs font-medium text-gray-400 hover:text-white hover:bg-white/4 transition-all"
           >
             CLI Docs
           </Link>
           <Link
             to="/download"
-            className="px-4 py-1.5 rounded-full text-xs font-medium text-gray-400 hover:text-white hover:bg-white/[0.04] transition-all"
+            className="px-4 py-1.5 rounded-full text-xs font-medium text-gray-400 hover:text-white hover:bg-white/4 transition-all"
           >
             Download
           </Link>
           <Link
             to="/about"
-            className="px-4 py-1.5 rounded-full text-xs font-medium text-gray-400 hover:text-white hover:bg-white/[0.04] transition-all"
+            className="px-4 py-1.5 rounded-full text-xs font-medium text-gray-400 hover:text-white hover:bg-white/4 transition-all"
           >
             About Us
           </Link>
@@ -614,7 +615,7 @@ export default function Dashboard() {
             href="https://github.com/ShauryaG05/PackPort"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-medium text-gray-400 hover:text-white hover:bg-white/[0.04] transition-all"
+            className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-medium text-gray-400 hover:text-white hover:bg-white/4 transition-all"
           >
             <GithubIcon size={13} />
             <span>GitHub</span>
@@ -626,7 +627,7 @@ export default function Dashboard() {
           {/* Search Button */}
           <button
             onClick={() => setSearchOpen(true)}
-            className="w-9 h-9 rounded-full bg-[#1c1f26] border border-white/[0.08] flex items-center justify-center text-gray-400 hover:text-white hover:border-white/20 transition-all cursor-pointer"
+            className="w-9 h-9 rounded-full bg-[#1c1f26] border border-white/8 flex items-center justify-center text-gray-400 hover:text-white hover:border-white/20 transition-all cursor-pointer"
             title="Search packages (⌘K)"
           >
             <Search size={16} />
@@ -636,7 +637,7 @@ export default function Dashboard() {
           <div className="relative">
             <button
               onClick={() => setNotificationsOpen(!notificationsOpen)}
-              className="w-9 h-9 rounded-full bg-[#1c1f26] border border-white/[0.08] flex items-center justify-center text-gray-400 hover:text-white hover:border-white/20 transition-all relative cursor-pointer"
+              className="w-9 h-9 rounded-full bg-[#1c1f26] border border-white/8 flex items-center justify-center text-gray-400 hover:text-white hover:border-white/20 transition-all relative cursor-pointer"
               title="Notifications"
             >
               <Bell size={16} />
@@ -658,7 +659,7 @@ export default function Dashboard() {
                   </button>
                 </div>
                 <div className="py-2 space-y-2 text-xs">
-                  <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/5 flex items-start gap-2.5">
+                  <div className="p-2.5 rounded-xl bg-white/3 border border-white/5 flex items-start gap-2.5">
                     <span className="w-2 h-2 rounded-full bg-emerald-400 mt-1 shrink-0" />
                     <div>
                       <p className="text-white font-medium">Agent Sync Active</p>
@@ -698,7 +699,7 @@ export default function Dashboard() {
             className="relative group p-0.5 rounded-full"
             title={`Logged in as ${user?.name || "Developer"}`}
           >
-            <div className="w-9 h-9 rounded-full bg-linear-to-tr from-amber-500 via-rose-500 to-orange-400 p-[2px] transition-transform group-hover:scale-105">
+            <div className="w-9 h-9 rounded-full bg-linear-to-tr from-amber-500 via-rose-500 to-orange-400 p-0.5 transition-transform group-hover:scale-105">
               <div className="w-full h-full rounded-full bg-[#111317] flex items-center justify-center overflow-hidden">
                 {user?.avatarUrl ? (
                   <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
@@ -714,7 +715,7 @@ export default function Dashboard() {
       </header>
 
       {/* Main Canvas Container */}
-      <main className="max-w-[1400px] mx-auto px-6 pt-8 space-y-8">
+      <main className="max-w-350 mx-auto px-6 pt-8 space-y-8">
         {/* ─────────────────────────────────────────────────────────────
             2. HERO GREETING & HORIZONTAL STATUS ROW
         ───────────────────────────────────────────────────────────── */}
@@ -745,7 +746,7 @@ export default function Dashboard() {
               {/* Badge 3: Ollama Models (Slate Capsule) */}
               <Link to="/package/ollama" className="space-y-1.5 hover:opacity-90 transition-opacity">
                 <span className="block text-[11px] font-medium text-gray-400">Ollama Local AI</span>
-                <span className="inline-flex items-center justify-center px-4 py-1.5 rounded-full text-xs font-medium text-gray-300 bg-[#282c35] border border-white/[0.05]">
+                <span className="inline-flex items-center justify-center px-4 py-1.5 rounded-full text-xs font-medium text-gray-300 bg-[#282c35] border border-white/5">
                   Models Active
                 </span>
               </Link>
@@ -756,7 +757,7 @@ export default function Dashboard() {
                 <span className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-medium border ${
                   agentOnline
                     ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30"
-                    : "bg-[#22252c] text-gray-400 border-white/[0.08]"
+                    : "bg-[#22252c] text-gray-400 border-white/8"
                 }`}>
                   <span className={`w-1.5 h-1.5 rounded-full ${agentOnline ? "bg-emerald-400 animate-ping" : "bg-gray-500"}`} />
                   {agentOnline ? "Connected" : "Standby"}
@@ -817,13 +818,13 @@ export default function Dashboard() {
         ───────────────────────────────────────────────────────────── */}
         <section className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
           {/* ── CARD 1: ECOSYSTEM HEALTH SUMMARY (Left, 3 cols) ── */}
-          <div className="md:col-span-3 bg-[#181a20] border border-white/[0.06] rounded-[28px] p-6 flex flex-col justify-between shadow-xl">
+          <div className="md:col-span-3 bg-[#181a20] border border-white/6 rounded-[28px] p-6 flex flex-col justify-between shadow-xl">
             <div>
               <h3 className="text-base font-semibold text-white tracking-tight mb-5">Telemetry Summary</h3>
 
               <div className="space-y-3">
                 {/* Item: Healthy Packages */}
-                <div className="flex items-center justify-between p-3 rounded-2xl bg-[#20232b] border border-white/[0.04]">
+                <div className="flex items-center justify-between p-3 rounded-2xl bg-[#20232b] border border-white/4">
                   <div className="flex items-center gap-2.5">
                     <span className="w-2 h-2 rounded-full bg-[#10b981]" />
                     <span className="text-xs font-medium text-gray-300">Up to Date</span>
@@ -832,7 +833,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* Item: Outdated / Drift */}
-                <div className="flex items-center justify-between p-3 rounded-2xl bg-[#20232b] border border-white/[0.04]">
+                <div className="flex items-center justify-between p-3 rounded-2xl bg-[#20232b] border border-white/4">
                   <div className="flex items-center gap-2.5">
                     <span className="w-2 h-2 rounded-full bg-[#ff2e7e]" />
                     <span className="text-xs font-medium text-gray-300">Updates Pending</span>
@@ -841,7 +842,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* Item: Active Tasks */}
-                <div className="flex items-center justify-between p-3 rounded-2xl bg-[#20232b] border border-white/[0.04]">
+                <div className="flex items-center justify-between p-3 rounded-2xl bg-[#20232b] border border-white/4">
                   <div className="flex items-center gap-2.5">
                     <span className="w-2 h-2 rounded-full bg-[#3b82f6]" />
                     <span className="text-xs font-medium text-gray-300">Active Tasks</span>
@@ -852,7 +853,7 @@ export default function Dashboard() {
             </div>
 
             {/* Bottom Alert / Info Box */}
-            <div className="mt-6 flex items-start gap-2.5 p-3 rounded-xl bg-white/[0.02] border border-white/[0.05]">
+            <div className="mt-6 flex items-start gap-2.5 p-3 rounded-xl bg-white/2 border border-white/5">
               <span className="text-gray-400 text-xs mt-0.5">ℹ</span>
               <p className="text-[11px] text-gray-400 leading-snug">
                 {globalStats.totalOutdated > 0
@@ -863,7 +864,7 @@ export default function Dashboard() {
           </div>
 
           {/* ── CARD 2: VERSION AUDIT & ENVIRONMENT CHECK CONTROL ── */}
-          <div className="md:col-span-6 bg-[#181a20] border border-white/[0.06] rounded-[28px] p-6 flex flex-col justify-between shadow-xl relative overflow-hidden">
+          <div className="md:col-span-6 bg-[#181a20] border border-white/6 rounded-[28px] p-6 flex flex-col justify-between shadow-xl relative overflow-hidden">
             {/* Header: Title + Global Check Button */}
             <div className="flex items-center justify-between mb-4">
               <div>
@@ -871,7 +872,7 @@ export default function Dashboard() {
                   <span>Version Check & Telemetry Audit</span>
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                 </h3>
-                <p className="text-[11px] text-gray-400 mt-0.5">
+                <p className="text-xs text-gray-400 mt-1">
                   Request on-demand version detection & package drift audits across local daemons
                 </p>
               </div>
@@ -879,7 +880,7 @@ export default function Dashboard() {
               <button
                 onClick={triggerScanAll}
                 disabled={scanning || Object.values(scanningLangs).some(Boolean)}
-                className="bg-[#242933] hover:bg-[#2d3442] text-white border border-white/[0.08] px-4 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+                className="bg-[#242933] hover:bg-[#2d3442] text-white border border-white/8 px-3.5 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 shadow-sm transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
               >
                 <RefreshCw size={12} className={scanning ? "animate-spin text-primary" : "text-gray-400"} />
                 <span>{scanning ? "Auditing..." : "Check All"}</span>
@@ -889,65 +890,81 @@ export default function Dashboard() {
             {/* 3 Runtime Version Check Action Cards */}
             <div className="space-y-3 my-auto">
               {/* Runtime 1: Python */}
-              <div className="p-3.5 rounded-2xl bg-[#20232b] hover:bg-[#232731] border border-white/[0.04] transition-all flex items-center justify-between gap-3 group">
+              <div className="p-3.5 rounded-2xl bg-[#20232b] hover:bg-[#232731] border border-white/4 transition-all flex items-center justify-between gap-3 group">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/25 flex items-center justify-center font-mono font-bold text-sm text-blue-400 shrink-0 group-hover:scale-105 transition-transform">
-                    Py
+                  <div className="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                    <PythonIcon size={18} />
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-white tracking-tight">Python Runtime</span>
-                      <span className="text-[10px] font-mono px-2 py-0.2 rounded-full bg-blue-500/10 text-blue-300 border border-blue-500/20">
+                      <span className="text-xs font-semibold text-white tracking-tight">Python Runtime</span>
+                      <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/20">
                         {ecosystems.python.packages.length} pkgs
                       </span>
                     </div>
-                    <p className="text-[11px] text-gray-400 font-mono truncate mt-0.5">
-                      {ecosystems.python.runtimeVersion || "Python 3.x (Active)"} • {ecosystems.python.outdated.length > 0 ? (
-                        <span className="text-amber-400 font-semibold">{ecosystems.python.outdated.length} outdated</span>
+                    <div className="flex items-center gap-2 text-xs text-gray-400 mt-1">
+                      <span>{ecosystems.python.runtimeVersion || "Python 3.x (Active)"}</span>
+                      <span className="text-gray-600">•</span>
+                      {ecosystems.python.outdated.length > 0 ? (
+                        <span className="text-amber-400 font-medium flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                          {ecosystems.python.outdated.length} outdated
+                        </span>
                       ) : (
-                        <span className="text-emerald-400">Up to date</span>
+                        <span className="text-emerald-400 font-medium flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                          Up to date
+                        </span>
                       )}
-                    </p>
+                    </div>
                   </div>
                 </div>
 
                 <button
                   onClick={() => triggerScanRuntime("python")}
                   disabled={scanningLangs.python || scanning}
-                  className="bg-[#282d38] hover:bg-blue-600/20 text-gray-200 hover:text-blue-300 border border-white/[0.08] hover:border-blue-500/40 px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all active:scale-95 disabled:opacity-50 shrink-0 cursor-pointer shadow-xs"
+                  className="bg-[#282d38] hover:bg-sky-500/15 text-gray-200 hover:text-sky-300 border border-white/8 hover:border-sky-500/30 px-3.5 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 transition-all active:scale-95 disabled:opacity-50 shrink-0 cursor-pointer shadow-xs"
                 >
-                  <RefreshCw size={12} className={scanningLangs.python ? "animate-spin text-blue-400" : "text-gray-400 group-hover:text-blue-400"} />
+                  <RefreshCw size={12} className={scanningLangs.python ? "animate-spin text-sky-400" : "text-gray-400 group-hover:text-sky-400"} />
                   <span>{scanningLangs.python ? "Checking..." : "Check Python"}</span>
                 </button>
               </div>
 
               {/* Runtime 2: Node.js */}
-              <div className="p-3.5 rounded-2xl bg-[#20232b] hover:bg-[#232731] border border-white/[0.04] transition-all flex items-center justify-between gap-3 group">
+              <div className="p-3.5 rounded-2xl bg-[#20232b] hover:bg-[#232731] border border-white/4 transition-all flex items-center justify-between gap-3 group">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center font-mono font-bold text-sm text-emerald-400 shrink-0 group-hover:scale-105 transition-transform">
-                    JS
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                    <NodeIcon size={18} />
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-white tracking-tight">Node.js Engine</span>
-                      <span className="text-[10px] font-mono px-2 py-0.2 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
+                      <span className="text-xs font-semibold text-white tracking-tight">Node.js Engine</span>
+                      <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                         {ecosystems.node.packages.length} pkgs
                       </span>
                     </div>
-                    <p className="text-[11px] text-gray-400 font-mono truncate mt-0.5">
-                      {ecosystems.node.runtimeVersion || "Node.js (Active)"} • {ecosystems.node.outdated.length > 0 ? (
-                        <span className="text-amber-400 font-semibold">{ecosystems.node.outdated.length} outdated</span>
+                    <div className="flex items-center gap-2 text-xs text-gray-400 mt-1">
+                      <span>{ecosystems.node.runtimeVersion || "Node.js (Active)"}</span>
+                      <span className="text-gray-600">•</span>
+                      {ecosystems.node.outdated.length > 0 ? (
+                        <span className="text-amber-400 font-medium flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                          {ecosystems.node.outdated.length} outdated
+                        </span>
                       ) : (
-                        <span className="text-emerald-400">Up to date</span>
+                        <span className="text-emerald-400 font-medium flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                          Up to date
+                        </span>
                       )}
-                    </p>
+                    </div>
                   </div>
                 </div>
 
                 <button
                   onClick={() => triggerScanRuntime("node")}
                   disabled={scanningLangs.node || scanning}
-                  className="bg-[#282d38] hover:bg-emerald-600/20 text-gray-200 hover:text-emerald-300 border border-white/[0.08] hover:border-emerald-500/40 px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all active:scale-95 disabled:opacity-50 shrink-0 cursor-pointer shadow-xs"
+                  className="bg-[#282d38] hover:bg-emerald-500/15 text-gray-200 hover:text-emerald-300 border border-white/8 hover:border-emerald-500/30 px-3.5 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 transition-all active:scale-95 disabled:opacity-50 shrink-0 cursor-pointer shadow-xs"
                 >
                   <RefreshCw size={12} className={scanningLangs.node ? "animate-spin text-emerald-400" : "text-gray-400 group-hover:text-emerald-400"} />
                   <span>{scanningLangs.node ? "Checking..." : "Check Node"}</span>
@@ -955,28 +972,33 @@ export default function Dashboard() {
               </div>
 
               {/* Runtime 3: Ollama */}
-              <div className="p-3.5 rounded-2xl bg-[#20232b] hover:bg-[#232731] border border-white/[0.04] transition-all flex items-center justify-between gap-3 group">
+              <div className="p-3.5 rounded-2xl bg-[#20232b] hover:bg-[#232731] border border-white/4 transition-all flex items-center justify-between gap-3 group">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/25 flex items-center justify-center font-mono font-bold text-sm text-purple-400 shrink-0 group-hover:scale-105 transition-transform">
-                    AI
+                  <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                    <OllamaIcon size={18} />
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-white tracking-tight">Ollama Local AI</span>
-                      <span className="text-[10px] font-mono px-2 py-0.2 rounded-full bg-purple-500/10 text-purple-300 border border-purple-500/20">
+                      <span className="text-xs font-semibold text-white tracking-tight">Ollama Local AI</span>
+                      <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20">
                         Weights Active
                       </span>
                     </div>
-                    <p className="text-[11px] text-gray-400 font-mono truncate mt-0.5">
-                      {ecosystems.ollama.runtimeVersion || "v0.3.12 (Local Server)"} • <span className="text-emerald-400">Up to date</span>
-                    </p>
+                    <div className="flex items-center gap-2 text-xs text-gray-400 mt-1">
+                      <span>{ecosystems.ollama.runtimeVersion || "v0.3.12 (Local Server)"}</span>
+                      <span className="text-gray-600">•</span>
+                      <span className="text-emerald-400 font-medium flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                        Up to date
+                      </span>
+                    </div>
                   </div>
                 </div>
 
                 <button
                   onClick={() => triggerScanRuntime("ollama")}
                   disabled={scanningLangs.ollama || scanning}
-                  className="bg-[#282d38] hover:bg-purple-600/20 text-gray-200 hover:text-purple-300 border border-white/[0.08] hover:border-purple-500/40 px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all active:scale-95 disabled:opacity-50 shrink-0 cursor-pointer shadow-xs"
+                  className="bg-[#282d38] hover:bg-purple-500/15 text-gray-200 hover:text-purple-300 border border-white/8 hover:border-purple-500/30 px-3.5 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 transition-all active:scale-95 disabled:opacity-50 shrink-0 cursor-pointer shadow-xs"
                 >
                   <RefreshCw size={12} className={scanningLangs.ollama ? "animate-spin text-purple-400" : "text-gray-400 group-hover:text-purple-400"} />
                   <span>{scanningLangs.ollama ? "Checking..." : "Check Ollama"}</span>
@@ -985,30 +1007,35 @@ export default function Dashboard() {
             </div>
 
             {/* Bottom Status / Feedback Toast */}
-            <div className="mt-4 pt-3 border-t border-white/[0.05] flex items-center justify-between text-xs">
-              <span className="text-gray-400 flex items-center gap-1.5 font-mono text-[11px]">
+            <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between text-xs">
+              <span className="text-gray-400 flex items-center gap-1.5 text-xs">
                 {lastCheckMessage ? (
-                  <span className="text-emerald-400 flex items-center gap-1.5 font-semibold animate-pulse">
+                  <span className="text-emerald-400 flex items-center gap-1.5 font-medium animate-pulse">
                     <CheckCircle2 size={13} className="text-emerald-400" />
                     {lastCheckMessage}
                   </span>
                 ) : (
-                  <span>Agent sockets active • Real-time telemetry monitoring</span>
+                  <span className="flex items-center gap-1.5 text-gray-400 text-xs">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                    <span>Agent sockets active</span>
+                    <span className="text-gray-600">•</span>
+                    <span>Real-time telemetry monitoring</span>
+                  </span>
                 )}
               </span>
 
               <Link
                 to="/docs/cli"
-                className="text-[11px] font-semibold text-gray-400 hover:text-white flex items-center gap-1 transition-colors"
+                className="text-xs font-medium text-gray-400 hover:text-white flex items-center gap-1 transition-colors"
               >
                 <span>Daemon Docs</span>
-                <ChevronRight size={12} />
+                <ChevronRight size={13} />
               </Link>
             </div>
           </div>
 
           {/* ── CARD 3: SECURITY & DRIFT (Right, 3 cols - Electric Blue Accent Card) ── */}
-          <div className="md:col-span-3 bg-gradient-to-b from-[#2563eb] to-[#1d4ed8] rounded-[28px] p-6 flex flex-col justify-between shadow-2xl relative overflow-hidden group">
+          <div className="md:col-span-3 bg-linear-to-b from-[#2563eb] to-[#1d4ed8] rounded-[28px] p-6 flex flex-col justify-between shadow-2xl relative overflow-hidden group">
             {/* Top Row: Title + Circular Arrow */}
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-bold text-white tracking-tight">Security & Drift</h3>
@@ -1052,7 +1079,7 @@ export default function Dashboard() {
         ───────────────────────────────────────────────────────────── */}
         <section className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
           {/* ── CARD 4: PRIORITY PACKAGE UPGRADES (Left, 5 cols) ── */}
-          <div className="md:col-span-5 bg-[#181a20] border border-white/[0.06] rounded-[28px] p-6 flex flex-col justify-between shadow-xl">
+          <div className="md:col-span-5 bg-[#181a20] border border-white/6 rounded-[28px] p-6 flex flex-col justify-between shadow-xl">
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
               <div>
@@ -1078,7 +1105,7 @@ export default function Dashboard() {
                 {globalStats.allOutdatedList.slice(0, 2).map((pkg, idx) => (
                   <div
                     key={idx}
-                    className="p-4 rounded-2xl bg-[#20232b] border border-white/[0.04] space-y-3 flex flex-col justify-between hover:border-white/10 transition-colors"
+                    className="p-4 rounded-2xl bg-[#20232b] border border-white/4 space-y-3 flex flex-col justify-between hover:border-white/10 transition-colors"
                   >
                     <div className="flex items-center justify-between">
                       <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
@@ -1098,7 +1125,7 @@ export default function Dashboard() {
                       </p>
                     </div>
 
-                    <div className="flex items-center justify-between pt-2 border-t border-white/[0.05]">
+                    <div className="flex items-center justify-between pt-2 border-t border-white/5">
                       <Link
                         to={`/package/${pkg.language}`}
                         className="text-[11px] text-gray-400 hover:text-white transition-colors"
@@ -1116,7 +1143,7 @@ export default function Dashboard() {
                 ))}
               </div>
             ) : (
-              <div className="p-6 rounded-2xl bg-[#20232b] border border-white/[0.04] my-auto text-center space-y-3">
+              <div className="p-6 rounded-2xl bg-[#20232b] border border-white/4 my-auto text-center space-y-3">
                 <CheckCircle2 size={32} className="text-emerald-400 mx-auto" />
                 <div>
                   <p className="text-sm font-semibold text-white">All Dependencies Up to Date</p>
@@ -1136,7 +1163,7 @@ export default function Dashboard() {
             )}
 
             {/* Bottom link to view full packages */}
-            <div className="mt-4 pt-3 border-t border-white/[0.05] flex items-center justify-between text-xs">
+            <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between text-xs">
               <span className="text-gray-400 text-[11px]">
                 {globalStats.totalPkgs} packages actively monitored across workstations
               </span>
@@ -1151,7 +1178,7 @@ export default function Dashboard() {
           </div>
 
           {/* ── CARD 5: ECOSYSTEM DRIFT STATISTICS (Center, 3 cols) ── */}
-          <div className="md:col-span-3 bg-[#181a20] border border-white/[0.06] rounded-[28px] p-6 flex flex-col justify-between shadow-xl relative overflow-hidden corner-peel">
+          <div className="md:col-span-3 bg-[#181a20] border border-white/6 rounded-[28px] p-6 flex flex-col justify-between shadow-xl relative overflow-hidden corner-peel">
             {/* Header + Diagonal Arrow */}
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-base font-semibold text-white tracking-tight">Telemetry Stats</h3>
@@ -1192,7 +1219,7 @@ export default function Dashboard() {
           </div>
 
           {/* ── CARD 6: DEVELOPER COPILOT & QUICK ACTIONS (Right, 4 cols) ── */}
-          <div className="md:col-span-4 bg-[#181a20] border border-white/[0.06] rounded-[28px] p-6 flex flex-col justify-between shadow-xl">
+          <div className="md:col-span-4 bg-[#181a20] border border-white/6 rounded-[28px] p-6 flex flex-col justify-between shadow-xl">
             {/* Header Greeting */}
             <div>
               <div className="flex items-center gap-2 mb-1">
@@ -1205,7 +1232,7 @@ export default function Dashboard() {
               <div className="grid grid-cols-2 gap-2.5">
                 <button
                   onClick={() => triggerScanRuntime("python")}
-                  className="flex items-center gap-2 p-2.5 rounded-xl bg-[#20232b] hover:bg-[#282d38] border border-white/[0.04] text-left transition-all group cursor-pointer"
+                  className="flex items-center gap-2 p-2.5 rounded-xl bg-[#20232b] hover:bg-[#282d38] border border-white/4 text-left transition-all group cursor-pointer"
                 >
                   <Code2 size={15} className="text-blue-400 shrink-0" />
                   <span className="text-xs font-medium text-gray-300 group-hover:text-white truncate">
@@ -1215,7 +1242,7 @@ export default function Dashboard() {
 
                 <button
                   onClick={() => triggerScanRuntime("node")}
-                  className="flex items-center gap-2 p-2.5 rounded-xl bg-[#20232b] hover:bg-[#282d38] border border-white/[0.04] text-left transition-all group cursor-pointer"
+                  className="flex items-center gap-2 p-2.5 rounded-xl bg-[#20232b] hover:bg-[#282d38] border border-white/4 text-left transition-all group cursor-pointer"
                 >
                   <Zap size={15} className="text-emerald-400 shrink-0" />
                   <span className="text-xs font-medium text-gray-300 group-hover:text-white truncate">
@@ -1231,7 +1258,7 @@ export default function Dashboard() {
                       triggerScanAll();
                     }
                   }}
-                  className="flex items-center gap-2 p-2.5 rounded-xl bg-[#20232b] hover:bg-[#282d38] border border-white/[0.04] text-left transition-all group cursor-pointer"
+                  className="flex items-center gap-2 p-2.5 rounded-xl bg-[#20232b] hover:bg-[#282d38] border border-white/4 text-left transition-all group cursor-pointer"
                 >
                   <RefreshCw size={15} className="text-rose-400 shrink-0" />
                   <span className="text-xs font-medium text-gray-300 group-hover:text-white truncate">
@@ -1241,7 +1268,7 @@ export default function Dashboard() {
 
                 <button
                   onClick={() => navigate("/docs/cli")}
-                  className="flex items-center gap-2 p-2.5 rounded-xl bg-[#20232b] hover:bg-[#282d38] border border-white/[0.04] text-left transition-all group cursor-pointer"
+                  className="flex items-center gap-2 p-2.5 rounded-xl bg-[#20232b] hover:bg-[#282d38] border border-white/4 text-left transition-all group cursor-pointer"
                 >
                   <Terminal size={15} className="text-purple-400 shrink-0" />
                   <span className="text-xs font-medium text-gray-300 group-hover:text-white truncate">
@@ -1275,7 +1302,7 @@ export default function Dashboard() {
                 value={assistantInput}
                 onChange={(e) => setAssistantInput(e.target.value)}
                 placeholder="Ask telemetry copilot..."
-                className="w-full bg-[#20232b] border border-white/[0.08] rounded-full py-2.5 pl-4 pr-11 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50 transition-colors"
+                className="w-full bg-[#20232b] border border-white/8 rounded-full py-2.5 pl-4 pr-11 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50 transition-colors"
               />
               <button
                 type="submit"
@@ -1292,7 +1319,7 @@ export default function Dashboard() {
             5. OPTIONAL TAB VIEWS: INCIDENTS / PACKAGES FULL TABLE
         ───────────────────────────────────────────────────────────── */}
         {activeTab === "incidents" && (
-          <section className="bg-[#181a20] border border-white/[0.06] rounded-[28px] p-6 shadow-xl space-y-4 animate-in fade-in duration-200">
+          <section className="bg-[#181a20] border border-white/6 rounded-[28px] p-6 shadow-xl space-y-4 animate-in fade-in duration-200">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-bold text-white tracking-tight">Active Packages & Drift Audit</h3>
@@ -1315,7 +1342,7 @@ export default function Dashboard() {
             {globalStats.allOutdatedList.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
-                  <thead className="text-[11px] font-mono text-gray-400 border-b border-white/[0.06]">
+                  <thead className="text-[11px] font-mono text-gray-400 border-b border-white/6">
                     <tr>
                       <th className="py-2.5 px-3">Ecosystem</th>
                       <th className="py-2.5 px-3">Package</th>
@@ -1324,9 +1351,9 @@ export default function Dashboard() {
                       <th className="py-2.5 px-3 text-right">Action</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/[0.04]">
+                  <tbody className="divide-y divide-white/4">
                     {globalStats.allOutdatedList.map((pkg, idx) => (
-                      <tr key={idx} className="hover:bg-white/[0.02]">
+                      <tr key={idx} className="hover:bg-white/2">
                         <td className="py-2.5 px-3 uppercase font-mono text-[10px] text-gray-400">{pkg.language}</td>
                         <td className="py-2.5 px-3 font-mono font-semibold text-white">{pkg.name}</td>
                         <td className="py-2.5 px-3 font-mono text-gray-400">{pkg.currentVersion}</td>

@@ -39,7 +39,7 @@ export default function AboutUs() {
   return (
     <div className="min-h-full w-full bg-[#111317] text-[#c9d1d9] font-sans pb-20 selection:bg-primary/30">
       {/* Top Hero Section */}
-      <div className="relative overflow-hidden border-b border-white/[0.06] bg-linear-to-b from-[#181a22] to-[#111317] py-16 px-6 md:px-12">
+      <div className="relative overflow-hidden border-b border-white/6 bg-linear-to-b from-[#181a22] to-[#111317] py-16 px-6 md:px-12">
         <div className="max-w-4xl mx-auto space-y-6">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-xs font-mono text-primary font-semibold">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
@@ -70,7 +70,7 @@ export default function AboutUs() {
 
             <Link
               to="/dashboard"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#20232b] hover:bg-[#282d38] border border-white/[0.08] text-white font-semibold text-xs transition-all active:scale-95"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#20232b] hover:bg-[#282d38] border border-white/8 text-white font-semibold text-xs transition-all active:scale-95"
             >
               <span>Open Dashboard</span>
               <ArrowRight size={14} className="text-gray-400" />
@@ -106,7 +106,7 @@ export default function AboutUs() {
 
         {/* 3 Pillars Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <div className="p-5 rounded-2xl bg-[#181a20] border border-white/[0.06] space-y-3">
+          <div className="p-5 rounded-2xl bg-[#181a20] border border-white/6 space-y-3">
             <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 font-bold">
               <Layers size={20} />
             </div>
@@ -117,7 +117,7 @@ export default function AboutUs() {
             </p>
           </div>
 
-          <div className="p-5 rounded-2xl bg-[#181a20] border border-white/[0.06] space-y-3">
+          <div className="p-5 rounded-2xl bg-[#181a20] border border-white/6 space-y-3">
             <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold">
               <Lock size={20} />
             </div>
@@ -128,7 +128,7 @@ export default function AboutUs() {
             </p>
           </div>
 
-          <div className="p-5 rounded-2xl bg-[#181a20] border border-white/[0.06] space-y-3">
+          <div className="p-5 rounded-2xl bg-[#181a20] border border-white/6 space-y-3">
             <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 font-bold">
               <Activity size={20} />
             </div>
@@ -141,7 +141,7 @@ export default function AboutUs() {
         </div>
 
         {/* Open Source & GitHub Card */}
-        <section className="p-6 rounded-2xl bg-linear-to-r from-[#1c1f28] to-[#161820] border border-white/[0.08] flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl">
+        <section className="p-6 rounded-2xl bg-linear-to-r from-[#1c1f28] to-[#161820] border border-white/8 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <GithubIcon size={20} className="text-white" />

@@ -259,7 +259,7 @@ export default function DownloadPage() {
               href="https://www.npmjs.com/package/packport-cli"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-primary-fixed hover:underline font-medium text-[#7bdb80]"
+              className="inline-flex items-center gap-1 text-primary-fixed hover:underline font-medium"
             >
               <span>View on npmjs.org</span>
               <ExternalLink className="w-3.5 h-3.5" />

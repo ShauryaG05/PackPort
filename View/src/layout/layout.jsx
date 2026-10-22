@@ -314,12 +314,12 @@ export default function Layout({ children }) {
 
             {/* SIDEBAR - Accessible across all routes including Dashboard */}
             <aside
-                className={`fixed md:static inset-y-0 left-0 z-50 flex flex-col w-64 shrink-0 bg-[#13151b] border-r border-white/[0.06] transition-transform duration-300 ease-in-out ${
+                className={`fixed md:static inset-y-0 left-0 z-50 flex flex-col w-64 shrink-0 bg-[#13151b] border-r border-white/6 transition-transform duration-300 ease-in-out ${
                     sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
                 }`}
             >
                 {/* Sidebar Header / Brand */}
-                <div className="flex items-center justify-between h-16 px-6 border-b border-white/[0.06] bg-[#161922]/40">
+                <div className="flex items-center justify-between h-16 px-6 border-b border-white/6 bg-[#161922]/40">
                     <NavLink
                         to="/dashboard"
                         className="hover:opacity-90 transition-opacity flex items-center gap-2.5"
@@ -340,7 +340,7 @@ export default function Layout({ children }) {
 
                 {/* Agent Status Card - Dynamic Connection State */}
                 <div className="px-4 pt-5 pb-3">
-                    <div className="rounded-2xl bg-[#1c1f28] border border-white/[0.06] p-3 shadow-inner">
+                    <div className="rounded-2xl bg-[#1c1f28] border border-white/6 p-3 shadow-inner">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <span className="relative flex h-2 w-2">
@@ -362,7 +362,7 @@ export default function Layout({ children }) {
                             </span>
                         </div>
                         {user?.agentCode && (
-                            <div className="mt-2 pt-2 border-t border-white/[0.04] flex items-center justify-between text-[10px] font-mono text-gray-400">
+                            <div className="mt-2 pt-2 border-t border-white/4 flex items-center justify-between text-[10px] font-mono text-gray-400">
                                 <span>Agent ID:</span>
                                 <span className="text-primary font-bold">{user.agentCode}</span>
                             </div>
@@ -389,8 +389,8 @@ export default function Layout({ children }) {
                                         onClick={() => setSidebarOpen(false)}
                                         className={`group flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all duration-150 ${
                                             isActive
-                                                ? "bg-[#282c35] text-white shadow-xs border border-white/[0.08]"
-                                                : "text-gray-400 hover:text-white hover:bg-white/[0.04]"
+                                                ? "bg-[#282c35] text-white shadow-xs border border-white/8"
+                                                : "text-gray-400 hover:text-white hover:bg-white/4"
                                         }`}
                                     >
                                         <div className="flex items-center gap-2.5">
@@ -425,8 +425,8 @@ export default function Layout({ children }) {
                                         onClick={() => setSidebarOpen(false)}
                                         className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all duration-150 ${
                                             isActive
-                                                ? "text-white bg-[#282c35] border border-white/[0.08] shadow-xs"
-                                                : "text-gray-400 hover:text-white hover:bg-white/[0.04]"
+                                                ? "text-white bg-[#282c35] border border-white/8 shadow-xs"
+                                                : "text-gray-400 hover:text-white hover:bg-white/4"
                                         }`}
                                     >
                                         <div className="flex items-center gap-2.5">
@@ -442,10 +442,10 @@ export default function Layout({ children }) {
                 </div>
 
                 {/* Footer / Real User Profile section */}
-                <div className="p-3 border-t border-white/[0.06] bg-[#161922]/50">
-                    <div className="flex items-center justify-between p-2 rounded-xl bg-[#1c1f28] border border-white/[0.05] transition-all hover:border-white/20 group">
+                <div className="p-3 border-t border-white/6 bg-[#161922]/50">
+                    <div className="flex items-center justify-between p-2 rounded-xl bg-[#1c1f28] border border-white/5 transition-all hover:border-white/20 group">
                         <NavLink to="/user" className="flex items-center gap-2.5 min-w-0 flex-1 hover:opacity-90 transition-opacity">
-                            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-500 via-rose-500 to-orange-400 p-[1.5px] shrink-0">
+                            <div className="w-8 h-8 rounded-full bg-linear-to-tr from-amber-500 via-rose-500 to-orange-400 p-[1.5px] shrink-0">
                                 <div className="w-full h-full rounded-full bg-[#111317] flex items-center justify-center font-bold text-xs text-amber-300">
                                     {user?.name ? user.name[0].toUpperCase() : (user?.email ? user.email[0].toUpperCase() : "U")}
                                 </div>

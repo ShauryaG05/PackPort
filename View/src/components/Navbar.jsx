@@ -288,13 +288,13 @@ export default function Navbar({
         </div>
 
         {/* 2. Center Navigation: Mathematically centered in the menu bar with direct links to important pages */}
-        <nav className="hidden lg:flex items-center gap-1 absolute left-1/2 -translate-x-1/2 bg-[#14161d] border border-white/[0.08] rounded-full p-1 shadow-inner">
+        <nav className="hidden lg:flex items-center gap-1 absolute left-1/2 -translate-x-1/2 bg-[#14161d] border border-white/8 rounded-full p-1 shadow-inner">
           <Link
             to="/dashboard"
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-150 ${
               location.pathname === "/dashboard"
-                ? "bg-[#282c35] text-white shadow-xs border border-white/[0.08]"
-                : "text-zinc-400 hover:text-white hover:bg-white/[0.04]"
+                ? "bg-[#282c35] text-white shadow-xs border border-white/8"
+                : "text-zinc-400 hover:text-white hover:bg-white/4"
             }`}
           >
             <LayoutDashboard size={14} className={location.pathname === "/dashboard" ? "text-primary" : "text-zinc-400"} />
@@ -305,8 +305,8 @@ export default function Navbar({
             to="/docs/cli"
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-150 ${
               location.pathname.startsWith("/docs")
-                ? "bg-[#282c35] text-white shadow-xs border border-white/[0.08]"
-                : "text-zinc-400 hover:text-white hover:bg-white/[0.04]"
+                ? "bg-[#282c35] text-white shadow-xs border border-white/8"
+                : "text-zinc-400 hover:text-white hover:bg-white/4"
             }`}
           >
             <Terminal size={14} className={location.pathname.startsWith("/docs") ? "text-primary" : "text-zinc-400"} />
@@ -317,8 +317,8 @@ export default function Navbar({
             to="/download"
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-150 ${
               location.pathname === "/download"
-                ? "bg-[#282c35] text-white shadow-xs border border-white/[0.08]"
-                : "text-zinc-400 hover:text-white hover:bg-white/[0.04]"
+                ? "bg-[#282c35] text-white shadow-xs border border-white/8"
+                : "text-zinc-400 hover:text-white hover:bg-white/4"
             }`}
           >
             <Download size={14} className={location.pathname === "/download" ? "text-primary" : "text-zinc-400"} />
@@ -329,8 +329,8 @@ export default function Navbar({
             to="/about"
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-150 ${
               location.pathname === "/about"
-                ? "bg-[#282c35] text-white shadow-xs border border-white/[0.08]"
-                : "text-zinc-400 hover:text-white hover:bg-white/[0.04]"
+                ? "bg-[#282c35] text-white shadow-xs border border-white/8"
+                : "text-zinc-400 hover:text-white hover:bg-white/4"
             }`}
           >
             <Info size={14} className={location.pathname === "/about" ? "text-primary" : "text-zinc-400"} />
@@ -341,7 +341,7 @@ export default function Navbar({
             href="https://github.com/ShauryaG05/PackPort"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold text-zinc-400 hover:text-white hover:bg-white/[0.04] transition-all duration-150"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold text-zinc-400 hover:text-white hover:bg-white/4 transition-all duration-150"
           >
             <GithubIcon size={14} />
             <span>GitHub</span>
