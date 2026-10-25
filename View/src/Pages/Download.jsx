@@ -49,7 +49,7 @@ const PM_INSTALL_COMMANDS = {
 
 const CLI_COMMANDS = [
   {
-    cmd: "packport start",
+    cmd: "packport",
     desc: "Launch daemon & start real-time port telemetry",
     category: "Core Engine",
   },
@@ -387,7 +387,7 @@ export default function DownloadPage() {
                   <span className="text-foreground truncate font-medium">packport start</span>
                   <button
                     type="button"
-                    onClick={() => handleCopy("packport start", "step-3")}
+                    onClick={() => handleCopy("packport", "step-3")}
                     className="text-muted-foreground hover:text-foreground p-1 cursor-pointer shrink-0 transition-colors"
                     title="Copy command"
                   >
