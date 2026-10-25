@@ -199,18 +199,19 @@ export default function Home() {
         {Authenticated ? <>
           <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto mb-12">
             <Link
-              to="/auth/signup"
-              className="w-full sm:w-auto px-6 py-2.5 rounded-lg text-sm font-medium text-white bg-primary hover:bg-primary-container transition-colors flex items-center justify-center gap-2 shadow-xs"
-            >
-              Get Started Free
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-            <Link
               to="/dashboard"
               className="w-full sm:w-auto px-6 py-2.5 rounded-lg text-sm font-medium text-[#c9d1d9] hover:text-on-surface bg-surface hover:bg-surface-variant border border-outline transition-colors flex items-center justify-center"
             >
               Open Dashboard
             </Link>
+            <Link
+              to="/download"
+              className="w-full sm:w-auto px-6 py-2.5 rounded-lg text-sm font-medium text-white bg-primary hover:bg-primary-container transition-colors flex items-center justify-center gap-2 shadow-xs"
+            >
+              Download
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+            
           </div>
         </> : <>
           <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto mb-12">
