@@ -95,14 +95,6 @@ export default function Home() {
               Open Dashboard
             </Link>
 
-
-            <Link
-              to="/auth/login"
-              className="w-full sm:w-auto px-6 py-2.5 rounded-lg text-sm font-medium text-[#c9d1d9] hover:text-on-surface bg-surface hover:bg-surface-variant border border-outline transition-colors flex items-center justify-center"
-            >
-              Log In
-            </Link>
-
           </div>
 
           {/* Terminal Command Box */}
