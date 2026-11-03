@@ -105,8 +105,8 @@ npm update
   return (
     <div className="min-h-screen bg-background text-[#c9d1d9] font-sans antialiased">
       {/* Top GitHub Docs Style Bar */}
-      <div className="border-b border-outline bg-[#161b22]/95 backdrop-blur-md sticky top-0 z-40 px-4 md:px-8 py-2.5 flex items-center justify-between text-xs">
-        <div className="flex items-center gap-3 sm:gap-4">
+      <div className="h-12 border-b border-outline bg-[#161b22]/95 backdrop-blur-md sticky top-0 z-40 px-3 sm:px-4 md:px-8 flex items-center justify-between gap-3 text-xs">
+        <div className="flex min-w-0 items-center gap-2 sm:gap-4">
           {/* Back to Dashboard Button */}
           <Link
             to="/dashboard"
@@ -114,8 +114,7 @@ npm update
             title="Return to PackPort Dashboard"
           >
             <ArrowLeft size={14} className="text-gray-400 group-hover:text-blue-400 group-hover:-translate-x-0.5 transition-transform" />
-            <span className="hidden sm:inline">Back to Dashboard</span>
-            <span className="sm:hidden">Dashboard</span>
+            <span className="hidden sm:inline">Dashboard</span>
           </Link>
 
           <div className="h-4 w-px bg-outline hidden sm:block" />
@@ -131,7 +130,8 @@ npm update
           <button
             onClick={() => setLeftNavCollapsed(!leftNavCollapsed)}
             title="Toggle Docs Navigation"
-            className="p-1.5 rounded-md hover:bg-[#21262d] text-gray-400 hover:text-white transition-colors cursor-pointer ml-1"
+            className="hidden md:inline-flex p-1.5 rounded-md hover:bg-[#21262d] text-gray-400 hover:text-white transition-colors cursor-pointer ml-1"
+            aria-label="Toggle documentation navigation"
           >
             <PanelLeft size={16} />
           </button>
@@ -151,7 +151,7 @@ npm update
             <span className="text-white font-medium">Free, Pro, & Team</span>
           </div>
 
-          <div className="relative w-44 sm:w-60">
+          <div className="relative hidden w-52 sm:block sm:w-60">
             <Search
               size={13}
               className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-500"
@@ -170,8 +170,28 @@ npm update
         </div>
       </div>
 
+      {/* Mobile section navigation: replaces the desktop documentation sidebar. */}
+      <nav
+        aria-label="Documentation sections"
+        className="md:hidden sticky top-12 z-30 flex gap-1 overflow-x-auto border-b border-outline bg-[#0d1117]/95 px-3 py-2 text-xs whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      >
+        {tocItems.map((item) => (
+          <a
+            key={item.id}
+            href={`#${item.id}`}
+            className={`shrink-0 rounded-md px-2.5 py-1.5 transition-colors ${
+              activeSection === item.id
+                ? "bg-blue-500/15 text-blue-300"
+                : "text-gray-400 hover:bg-white/5 hover:text-white"
+            }`}
+          >
+            {item.label}
+          </a>
+        ))}
+      </nav>
+
       {/* Main 3-Column Docs Layout */}
-      <div className="max-w-360 mx-auto flex">
+      <div className="mx-auto flex w-full max-w-[1440px]">
         {/* Left Sub-Sidebar (Collapsible like GitHub Docs) */}
         {!leftNavCollapsed && (
           <aside className="w-64 shrink-0 border-r border-outline p-5 hidden md:block sticky top-12 h-[calc(100vh-48px)] overflow-y-auto">
@@ -328,24 +348,24 @@ npm update
                 </a>
 
                 {/* Return to Main Site Button */}
-                <div className="pt-3 mt-3 border-t border-outline/60">
+                {/* <div className="pt-3 mt-3 border-t border-outline/60">
                   <Link
                     to="/dashboard"
                     className="w-full flex items-center justify-between px-2.5 py-2 text-xs font-medium text-gray-300 hover:text-white bg-[#161b22] hover:bg-[#21262d] border border-outline hover:border-blue-500/40 rounded-lg transition-all group shadow-xs cursor-pointer"
                   >
                     <span className="flex items-center gap-2">
-                      <ArrowLeft size={13} className="text-gray-400 group-hover:text-blue-400 group-hover:-translate-x-0.5 transition-transform" />
-                      <span>Main Site</span>
-                    </span>
-                  </Link>
-                </div>
+                      {/* <ArrowLeft size={13} className="text-gray-400 group-hover:text-blue-400 group-hover:-translate-x-0.5 transition-transform" /> */}
+                      {/* <span>Dashboard</span> */}
+                    {/* </span> */}
+                  {/* </Link> */}
+                {/* </div> */}
               </div>
             </nav>
           </aside>
         )}
 
         {/* Center Article Reading Column */}
-        <main className="flex-1 min-w-0 px-6 md:px-12 py-10 max-w-4xl">
+        <main className="flex-1 min-w-0 px-4 py-8 sm:px-6 md:px-12 md:py-10 max-w-4xl">
           {/* Article Hero */}
           <div className="pb-6 border-b border-outline mb-10">
             <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight leading-tight">
@@ -357,7 +377,7 @@ npm update
           </div>
 
           {/* Section 1: Introduction */}
-          <section id="introduction" className="space-y-4 mb-12 scroll-mt-20">
+          <section id="introduction" className="space-y-4 mb-12 scroll-mt-24 md:scroll-mt-20">
             <div className="flex items-center gap-2 group">
               <h2 className="text-2xl font-semibold text-white tracking-tight">
                 Introduction
@@ -380,7 +400,7 @@ npm update
           </section>
 
           {/* Section 2: Quickstart Steps */}
-          <section id="quickstart" className="space-y-6 mb-14 scroll-mt-20">
+          <section id="quickstart" className="space-y-6 mb-14 scroll-mt-24 md:scroll-mt-20">
             <div className="flex items-center gap-2 group">
               <h2 className="text-2xl font-semibold text-white tracking-tight">
                 Quickstart commands
@@ -461,7 +481,7 @@ npm update
           </section>
 
           {/* Section 3: Python */}
-          <section id="python-pip" className="space-y-5 mb-14 scroll-mt-20 border-t border-outline pt-8">
+          <section id="python-pip" className="space-y-5 mb-14 scroll-mt-24 md:scroll-mt-20 border-t border-outline pt-8">
             <div className="flex items-center gap-2 group">
               <h2 className="text-2xl font-semibold text-white tracking-tight">
                 Python (pip & poetry)
@@ -528,7 +548,7 @@ npm update
           </section>
 
           {/* Section 4: Node.js */}
-          <section id="nodejs-npm" className="space-y-5 mb-14 scroll-mt-20 border-t border-outline pt-8">
+          <section id="nodejs-npm" className="space-y-5 mb-14 scroll-mt-24 md:scroll-mt-20 border-t border-outline pt-8">
             <div className="flex items-center gap-2 group">
               <h2 className="text-2xl font-semibold text-white tracking-tight">
                 Node.js (npm, pnpm, yarn, bun)
@@ -589,7 +609,7 @@ npm update
           </section>
 
           {/* Section 5: Rust */}
-          <section id="rust-cargo" className="space-y-5 mb-14 scroll-mt-20 border-t border-outline pt-8">
+          <section id="rust-cargo" className="space-y-5 mb-14 scroll-mt-24 md:scroll-mt-20 border-t border-outline pt-8">
             <div className="flex items-center gap-2 group">
               <h2 className="text-2xl font-semibold text-white tracking-tight">
                 Rust (cargo)
@@ -625,7 +645,7 @@ npm update
           </section>
 
           {/* Section 6: Go */}
-          <section id="go-modules" className="space-y-5 mb-14 scroll-mt-20 border-t border-outline pt-8">
+          <section id="go-modules" className="space-y-5 mb-14 scroll-mt-24 md:scroll-mt-20 border-t border-outline pt-8">
             <div className="flex items-center gap-2 group">
               <h2 className="text-2xl font-semibold text-white tracking-tight">
                 Go (modules)
@@ -661,7 +681,7 @@ npm update
           </section>
 
           {/* Section 7: Next Steps & Safety Alert */}
-          <section id="next-steps" className="space-y-5 mb-16 scroll-mt-20 border-t border-outline pt-8">
+          <section id="next-steps" className="space-y-5 mb-16 scroll-mt-24 md:scroll-mt-20 border-t border-outline pt-8">
             <div className="flex items-center gap-2 group">
               <h2 className="text-2xl font-semibold text-white tracking-tight">
                 Next steps & best practices

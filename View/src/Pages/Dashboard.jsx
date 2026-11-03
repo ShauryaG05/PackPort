@@ -586,7 +586,7 @@ export default function Dashboard() {
         </div>
 
         {/* Center: Floating Capsule Pill Navigation to Important Pages */}
-        <nav className="hidden md:flex items-center bg-[#1c1f26] border border-white/8 rounded-full p-1 shadow-inner gap-1">
+        <nav className="hidden xl:flex items-center bg-[#1c1f26] border border-white/8 rounded-full p-1 shadow-inner gap-1">
           <Link
             to="/dashboard"
             className="px-4 py-1.5 rounded-full text-xs font-semibold bg-[#282c35] text-white shadow-xs border border-white/8 transition-all"

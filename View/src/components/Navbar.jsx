@@ -288,7 +288,7 @@ export default function Navbar({
         </div>
 
         {/* 2. Center Navigation: Mathematically centered in the menu bar with direct links to important pages */}
-        <nav className="hidden lg:flex items-center gap-1 absolute left-1/2 -translate-x-1/2 bg-[#14161d] border border-white/8 rounded-full p-1 shadow-inner">
+        <nav className="hidden xl:flex items-center gap-1 absolute left-1/2 -translate-x-1/2 bg-[#14161d] border border-white/8 rounded-full p-1 shadow-inner">
           <Link
             to="/dashboard"
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-150 ${
@@ -349,7 +349,7 @@ export default function Navbar({
         </nav>
 
         {/* 3. Right Action Items */}
-        <div className="hidden lg:flex items-center gap-3 shrink-0">
+        <div className="hidden xl:flex items-center gap-3 shrink-0">
           {/* Docs Link */}
           <Link
             to="/docs/cli"
@@ -406,7 +406,7 @@ export default function Navbar({
         </div>
 
         {/* Mobile Hamburger Button */}
-        <div className="lg:hidden flex items-center gap-2">
+        <div className="xl:hidden flex items-center gap-2">
           {!isAuth ? (
             <Link
               to="/auth/login"
@@ -867,7 +867,7 @@ export default function Navbar({
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
-            className="lg:hidden bg-[#0c0d12] border-b border-white/10 px-4 py-6 overflow-y-auto max-h-[85vh] space-y-4"
+            className="xl:hidden bg-[#0c0d12] border-b border-white/10 px-4 py-6 overflow-y-auto max-h-[85vh] space-y-4"
           >
             {/* Mobile Important Pages Direct Access */}
             <div className="space-y-1 border-b border-white/6 pb-4">
