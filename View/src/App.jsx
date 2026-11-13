@@ -28,11 +28,11 @@ function App() {
 
         {/* Download Page */}
         <Route path="/download" element={<Download />} />
+        <Route path="/about" element={<AboutUs />} />
 
         {/* Main App Routes with Sidebar Layout */}
         <Route element={<Layout />}>
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/about" element={<AboutUs />} />
           <Route path="/package/:language" element={<Packages />} />
           <Route path="/package" element={<Navigate to="/package/python" replace />} />
           <Route path="/user" element={<UserPage />} />
