@@ -1,8 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { Link } from "react-router-dom";
-import PackPortLogo from "../components/PackPortLogo";
+import Navbar from "../components/Navbar";
 import {
-  ArrowLeft,
   Search,
   ChevronDown,
   ChevronRight,
@@ -13,6 +12,9 @@ import {
   ExternalLink,
   ShieldCheck,
   Terminal,
+  X,
+  ArrowRight,
+  Sparkles,
 } from "lucide-react";
 
 export default function CliDocs() {
@@ -20,10 +22,11 @@ export default function CliDocs() {
   const [activeSection, setActiveSection] = useState("introduction");
   const [searchQuery, setSearchQuery] = useState("");
   const [leftNavCollapsed, setLeftNavCollapsed] = useState(false);
+  const searchInputRef = useRef(null);
   const [expandedNav, setExpandedNav] = useState({
     gettingStarted: true,
-    python: false,
-    nodejs: false,
+    python: true,
+    nodejs: true,
     rustGo: false,
     troubleshooting: false,
   });
@@ -38,6 +41,26 @@ export default function CliDocs() {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
+  // Keyboard shortcut listener for '/' to focus search input
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (
+        e.key === "/" &&
+        document.activeElement?.tagName !== "INPUT" &&
+        document.activeElement?.tagName !== "TEXTAREA"
+      ) {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+      if (e.key === "b" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setLeftNavCollapsed((prev) => !prev);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   // Scroll listener for table of contents
   useEffect(() => {
     const handleScroll = () => {
@@ -50,7 +73,7 @@ export default function CliDocs() {
         "go-modules",
         "next-steps",
       ];
-      const scrollY = window.scrollY + 120;
+      const scrollY = window.scrollY + 140;
       for (const id of sections) {
         const el = document.getElementById(id);
         if (el) {
@@ -63,7 +86,7 @@ export default function CliDocs() {
         }
       }
     };
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -76,6 +99,17 @@ export default function CliDocs() {
     { id: "go-modules", label: "Go (modules)" },
     { id: "next-steps", label: "Next steps & best practices" },
   ];
+
+  // Filter tocItems based on search query
+  const filteredTocItems = useMemo(() => {
+    if (!searchQuery.trim()) return tocItems;
+    const q = searchQuery.toLowerCase();
+    return tocItems.filter(
+      (item) =>
+        item.label.toLowerCase().includes(q) ||
+        item.id.toLowerCase().includes(q)
+    );
+  }, [searchQuery]);
 
   const fullMarkdownDoc = `# Quickstart for Updating Packages
 Get started with updating runtime dependencies and managing outdated versions.
@@ -103,86 +137,117 @@ npm update
 `;
 
   return (
-    <div className="min-h-screen bg-background text-[#c9d1d9] font-sans antialiased">
-      {/* Top GitHub Docs Style Bar */}
-      <div className="h-12 border-b border-outline bg-[#161b22]/95 backdrop-blur-md sticky top-0 z-40 px-3 sm:px-4 md:px-8 flex items-center justify-between gap-3 text-xs">
-        <div className="flex min-w-0 items-center gap-2 sm:gap-4">
-          {/* Back to Dashboard Button */}
-          <Link
-            to="/dashboard"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-outline bg-background hover:bg-[#21262d] text-xs font-medium text-gray-300 hover:text-white transition-all cursor-pointer shadow-xs group"
-            title="Return to PackPort Dashboard"
-          >
-            <ArrowLeft size={14} className="text-gray-400 group-hover:text-blue-400 group-hover:-translate-x-0.5 transition-transform" />
-            <span className="hidden sm:inline">Dashboard</span>
-          </Link>
+    <div className="min-h-screen bg-background text-[#c9d1d9] font-sans antialiased selection:bg-blue-500/30 selection:text-white">
+      {/* ── 1. Standardized Top Navigation Bar ── */}
+      <Navbar />
 
-          <div className="h-4 w-px bg-outline hidden sm:block" />
-
-          {/* Docs Brand */}
-          <Link to="/docs/cli" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
-            <PackPortLogo size={26} showBadge={false} />
-            <span className="text-[11px] font-semibold font-mono px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">
-              Docs
-            </span>
-          </Link>
-
+      {/* ── 2. Dedicated Docs Sub-Header / Utility Toolbar ── */}
+      <div className="h-12 border-b border-white/8 bg-[#0d1117]/95 backdrop-blur-md sticky top-16 z-30 px-3 sm:px-6 lg:px-8 flex items-center justify-between gap-3 text-xs">
+        {/* Left: Sidebar Toggle, Docs Breadcrumb & Version */}
+        <div className="flex min-w-0 items-center gap-2 sm:gap-3.5">
           <button
             onClick={() => setLeftNavCollapsed(!leftNavCollapsed)}
-            title="Toggle Docs Navigation"
-            className="hidden md:inline-flex p-1.5 rounded-md hover:bg-[#21262d] text-gray-400 hover:text-white transition-colors cursor-pointer ml-1"
+            title="Toggle Docs Sidebar (⌘B)"
+            className={`p-1.5 rounded-lg border transition-all cursor-pointer flex items-center gap-1.5 ${
+              leftNavCollapsed
+                ? "bg-white/4 border-white/8 text-zinc-400 hover:text-white hover:bg-white/8"
+                : "bg-blue-500/10 border-blue-500/30 text-blue-400"
+            }`}
             aria-label="Toggle documentation navigation"
           >
-            <PanelLeft size={16} />
+            <PanelLeft size={15} />
+            <span className="hidden sm:inline text-[11px] font-medium">
+              {leftNavCollapsed ? "Show Sidebar" : "Hide Sidebar"}
+            </span>
           </button>
 
+          <div className="h-4 w-px bg-white/10 hidden sm:block" />
+
           {/* Breadcrumb */}
-          <nav className="hidden lg:flex items-center gap-1.5 text-gray-400 font-mono text-[11px]">
-            <Link to="/dashboard" className="hover:text-white cursor-pointer">Dashboard</Link>
-            <span>/</span>
-            <span className="text-white font-semibold">Documentation</span>
+          <nav className="flex items-center gap-1.5 text-zinc-400 font-mono text-[11px] truncate">
+            <Link
+              to="/dashboard"
+              className="hover:text-white transition-colors cursor-pointer hidden md:inline"
+            >
+              Dashboard
+            </Link>
+            <span className="hidden md:inline text-zinc-600">/</span>
+            <span className="text-zinc-300 font-medium">Docs</span>
+            <span className="text-zinc-600">/</span>
+            <span className="text-blue-400 font-semibold truncate">CLI Reference</span>
           </nav>
+
+          <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/4 border border-white/8 text-zinc-300 text-[10px] font-mono">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span>v1.2.2 • Free, Pro & Team</span>
+          </div>
         </div>
 
-        {/* Right Search Bar */}
-        <div className="flex items-center gap-3">
-          <div className="hidden md:flex items-center gap-2 px-2.5 py-1 rounded-md bg-background border border-outline text-gray-400 text-xs">
-            <span>Version:</span>
-            <span className="text-white font-medium">Free, Pro, & Team</span>
-          </div>
-
-          <div className="relative hidden w-52 sm:block sm:w-60">
+        {/* Right: Docs Live Search & Markdown Copy */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* Search Bar with Keyboard Shortcut */}
+          <div className="relative w-44 sm:w-60">
             <Search
               size={13}
-              className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-500"
+              className="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none"
             />
             <input
+              ref={searchInputRef}
               type="text"
-              placeholder="Search or ask Copilot"
+              placeholder="Search docs (e.g. pip, npm)..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-8 pr-7 py-1 rounded-md bg-background border border-outline text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors"
+              className="w-full pl-8 pr-8 py-1.5 rounded-lg bg-[#14161f] border border-white/10 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 transition-all font-sans"
             />
-            <kbd className="absolute right-2 top-1/2 -translate-y-1/2 px-1 py-0.2 rounded border border-outline bg-[#161b22] text-[10px] text-gray-400 font-mono">
-              /
-            </kbd>
+            {searchQuery ? (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white p-0.5 cursor-pointer"
+                title="Clear search"
+              >
+                <X size={12} />
+              </button>
+            ) : (
+              <kbd className="absolute right-2 top-1/2 -translate-y-1/2 px-1.5 py-0.5 rounded border border-white/10 bg-white/4 text-[9px] text-zinc-400 font-mono pointer-events-none hidden sm:inline">
+                /
+              </kbd>
+            )}
           </div>
+
+          {/* Quick Copy Markdown */}
+          <button
+            onClick={() => handleCopy(fullMarkdownDoc, "copy-md-top")}
+            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/4 hover:bg-white/8 border border-white/8 text-xs font-medium text-zinc-300 hover:text-white transition-all cursor-pointer shrink-0"
+            title="Copy full document as Markdown"
+          >
+            {copiedId === "copy-md-top" ? (
+              <>
+                <Check size={13} className="text-emerald-400" />
+                <span className="text-emerald-400 font-medium">Copied!</span>
+              </>
+            ) : (
+              <>
+                <Copy size={13} />
+                <span>Copy Markdown</span>
+              </>
+            )}
+          </button>
         </div>
       </div>
 
-      {/* Mobile section navigation: replaces the desktop documentation sidebar. */}
+      {/* ── 3. Mobile Section Navigation Strip ── */}
       <nav
         aria-label="Documentation sections"
-        className="md:hidden sticky top-12 z-30 flex gap-1 overflow-x-auto border-b border-outline bg-[#0d1117]/95 px-3 py-2 text-xs whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="md:hidden sticky top-28 z-20 flex gap-1 overflow-x-auto border-b border-white/8 bg-[#0d1117]/95 backdrop-blur-md px-3 py-2 text-xs whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {tocItems.map((item) => (
           <a
             key={item.id}
             href={`#${item.id}`}
-            className={`shrink-0 rounded-md px-2.5 py-1.5 transition-colors ${
+            className={`shrink-0 rounded-lg px-2.5 py-1.5 transition-colors font-medium ${
               activeSection === item.id
-                ? "bg-blue-500/15 text-blue-300"
-                : "text-gray-400 hover:bg-white/5 hover:text-white"
+                ? "bg-blue-500/15 text-blue-300 border border-blue-500/30"
+                : "text-zinc-400 hover:bg-white/5 hover:text-white"
             }`}
           >
             {item.label}
@@ -190,48 +255,62 @@ npm update
         ))}
       </nav>
 
-      {/* Main 3-Column Docs Layout */}
+      {/* ── 4. Main 3-Column Docs Layout ── */}
       <div className="mx-auto flex w-full max-w-[1440px]">
-        {/* Left Sub-Sidebar (Collapsible like GitHub Docs) */}
+        {/* Left Sub-Sidebar (Collapsible) */}
         {!leftNavCollapsed && (
-          <aside className="w-64 shrink-0 border-r border-outline p-5 hidden md:block sticky top-12 h-[calc(100vh-48px)] overflow-y-auto">
-            <h2 className="text-base font-bold text-white mb-4 tracking-tight">
-              Package Managers
-            </h2>
+          <aside className="w-64 shrink-0 border-r border-white/8 p-5 hidden md:block sticky top-28 h-[calc(100vh-112px)] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                Package Managers
+              </h2>
+              <span className="text-[10px] font-mono text-zinc-500">v1.2</span>
+            </div>
 
             <nav className="space-y-1 text-xs">
-              {/* Quickstart (Active item with GitHub green left bar) */}
+              {/* Quickstart item */}
               <a
                 href="#quickstart"
-                className="flex items-center justify-between px-3 py-1.5 rounded-r-md text-emerald-400 font-medium bg-emerald-500/10 border-l-2 border-emerald-500 -ml-5 pl-4 transition-colors"
+                className={`flex items-center justify-between px-3 py-2 rounded-xl font-medium transition-all ${
+                  activeSection === "quickstart"
+                    ? "text-blue-400 bg-blue-500/10 border border-blue-500/20"
+                    : "text-zinc-300 hover:text-white hover:bg-white/4"
+                }`}
               >
-                <span>Quickstart</span>
+                <span>Quickstart Guide</span>
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/6 text-zinc-400">
+                  CLI
+                </span>
               </a>
 
               {/* Accordion 1: Getting Started */}
-              <div>
+              <div className="pt-1">
                 <button
                   onClick={() => toggleNav("gettingStarted")}
-                  className="w-full flex items-center justify-between px-2 py-1.5 text-gray-300 hover:text-white hover:bg-[#21262d] rounded-md transition-colors cursor-pointer"
+                  className="w-full flex items-center justify-between px-2.5 py-2 text-zinc-300 hover:text-white hover:bg-white/4 rounded-xl transition-colors cursor-pointer"
                 >
-                  <span>Getting started</span>
+                  <span className="font-semibold">Getting started</span>
                   {expandedNav.gettingStarted ? (
-                    <ChevronDown size={14} />
+                    <ChevronDown size={14} className="text-zinc-400" />
                   ) : (
-                    <ChevronRight size={14} />
+                    <ChevronRight size={14} className="text-zinc-400" />
                   )}
                 </button>
                 {expandedNav.gettingStarted && (
-                  <div className="ml-3 pl-2 border-l border-outline mt-1 space-y-1">
+                  <div className="ml-3 pl-2 border-l border-white/8 mt-1 space-y-1">
                     <a
                       href="#introduction"
-                      className="block px-2 py-1 text-gray-400 hover:text-white rounded transition-colors"
+                      className={`block px-2.5 py-1.5 rounded-lg transition-colors ${
+                        activeSection === "introduction"
+                          ? "text-blue-400 font-medium bg-blue-500/10"
+                          : "text-zinc-400 hover:text-white hover:bg-white/4"
+                      }`}
                     >
                       Introduction
                     </a>
                     <a
                       href="#quickstart"
-                      className="block px-2 py-1 text-gray-400 hover:text-white rounded transition-colors"
+                      className="block px-2.5 py-1.5 text-zinc-400 hover:text-white hover:bg-white/4 rounded-lg transition-colors"
                     >
                       Core Architecture
                     </a>
@@ -243,26 +322,30 @@ npm update
               <div>
                 <button
                   onClick={() => toggleNav("python")}
-                  className="w-full flex items-center justify-between px-2 py-1.5 text-gray-300 hover:text-white hover:bg-[#21262d] rounded-md transition-colors cursor-pointer"
+                  className="w-full flex items-center justify-between px-2.5 py-2 text-zinc-300 hover:text-white hover:bg-white/4 rounded-xl transition-colors cursor-pointer"
                 >
-                  <span>Python (pip & poetry)</span>
+                  <span className="font-semibold">Python (pip & poetry)</span>
                   {expandedNav.python ? (
-                    <ChevronDown size={14} />
+                    <ChevronDown size={14} className="text-zinc-400" />
                   ) : (
-                    <ChevronRight size={14} />
+                    <ChevronRight size={14} className="text-zinc-400" />
                   )}
                 </button>
                 {expandedNav.python && (
-                  <div className="ml-3 pl-2 border-l border-outline mt-1 space-y-1">
+                  <div className="ml-3 pl-2 border-l border-white/8 mt-1 space-y-1">
                     <a
                       href="#python-pip"
-                      className="block px-2 py-1 text-gray-400 hover:text-white rounded transition-colors"
+                      className={`block px-2.5 py-1.5 rounded-lg transition-colors ${
+                        activeSection === "python-pip"
+                          ? "text-blue-400 font-medium bg-blue-500/10"
+                          : "text-zinc-400 hover:text-white hover:bg-white/4"
+                      }`}
                     >
                       pip outdated
                     </a>
                     <a
                       href="#python-pip"
-                      className="block px-2 py-1 text-gray-400 hover:text-white rounded transition-colors"
+                      className="block px-2.5 py-1.5 text-zinc-400 hover:text-white hover:bg-white/4 rounded-lg transition-colors"
                     >
                       pip install --upgrade
                     </a>
@@ -274,26 +357,30 @@ npm update
               <div>
                 <button
                   onClick={() => toggleNav("nodejs")}
-                  className="w-full flex items-center justify-between px-2 py-1.5 text-gray-300 hover:text-white hover:bg-[#21262d] rounded-md transition-colors cursor-pointer"
+                  className="w-full flex items-center justify-between px-2.5 py-2 text-zinc-300 hover:text-white hover:bg-white/4 rounded-xl transition-colors cursor-pointer"
                 >
-                  <span>Node.js ecosystem</span>
+                  <span className="font-semibold">Node.js ecosystem</span>
                   {expandedNav.nodejs ? (
-                    <ChevronDown size={14} />
+                    <ChevronDown size={14} className="text-zinc-400" />
                   ) : (
-                    <ChevronRight size={14} />
+                    <ChevronRight size={14} className="text-zinc-400" />
                   )}
                 </button>
                 {expandedNav.nodejs && (
-                  <div className="ml-3 pl-2 border-l border-outline mt-1 space-y-1">
+                  <div className="ml-3 pl-2 border-l border-white/8 mt-1 space-y-1">
                     <a
                       href="#nodejs-npm"
-                      className="block px-2 py-1 text-gray-400 hover:text-white rounded transition-colors"
+                      className={`block px-2.5 py-1.5 rounded-lg transition-colors ${
+                        activeSection === "nodejs-npm"
+                          ? "text-blue-400 font-medium bg-blue-500/10"
+                          : "text-zinc-400 hover:text-white hover:bg-white/4"
+                      }`}
                     >
                       npm outdated & update
                     </a>
                     <a
                       href="#nodejs-npm"
-                      className="block px-2 py-1 text-gray-400 hover:text-white rounded transition-colors"
+                      className="block px-2.5 py-1.5 text-zinc-400 hover:text-white hover:bg-white/4 rounded-lg transition-colors"
                     >
                       pnpm & yarn
                     </a>
@@ -305,26 +392,34 @@ npm update
               <div>
                 <button
                   onClick={() => toggleNav("rustGo")}
-                  className="w-full flex items-center justify-between px-2 py-1.5 text-gray-300 hover:text-white hover:bg-[#21262d] rounded-md transition-colors cursor-pointer"
+                  className="w-full flex items-center justify-between px-2.5 py-2 text-zinc-300 hover:text-white hover:bg-white/4 rounded-xl transition-colors cursor-pointer"
                 >
-                  <span>Rust & Go</span>
+                  <span className="font-semibold">Rust & Go</span>
                   {expandedNav.rustGo ? (
-                    <ChevronDown size={14} />
+                    <ChevronDown size={14} className="text-zinc-400" />
                   ) : (
-                    <ChevronRight size={14} />
+                    <ChevronRight size={14} className="text-zinc-400" />
                   )}
                 </button>
                 {expandedNav.rustGo && (
-                  <div className="ml-3 pl-2 border-l border-outline mt-1 space-y-1">
+                  <div className="ml-3 pl-2 border-l border-white/8 mt-1 space-y-1">
                     <a
                       href="#rust-cargo"
-                      className="block px-2 py-1 text-gray-400 hover:text-white rounded transition-colors"
+                      className={`block px-2.5 py-1.5 rounded-lg transition-colors ${
+                        activeSection === "rust-cargo"
+                          ? "text-blue-400 font-medium bg-blue-500/10"
+                          : "text-zinc-400 hover:text-white hover:bg-white/4"
+                      }`}
                     >
                       cargo outdated & update
                     </a>
                     <a
                       href="#go-modules"
-                      className="block px-2 py-1 text-gray-400 hover:text-white rounded transition-colors"
+                      className={`block px-2.5 py-1.5 rounded-lg transition-colors ${
+                        activeSection === "go-modules"
+                          ? "text-blue-400 font-medium bg-blue-500/10"
+                          : "text-zinc-400 hover:text-white hover:bg-white/4"
+                      }`}
                     >
                       go get -u & go mod tidy
                     </a>
@@ -333,32 +428,17 @@ npm update
               </div>
 
               {/* Additional Sections */}
-              <div className="pt-4 border-t border-outline mt-4 space-y-1">
+              <div className="pt-4 border-t border-white/8 mt-4 space-y-1">
                 <a
                   href="#next-steps"
-                  className="block px-2 py-1.5 text-gray-400 hover:text-white hover:bg-[#21262d] rounded transition-colors"
+                  className={`block px-2.5 py-2 rounded-xl transition-colors ${
+                    activeSection === "next-steps"
+                      ? "text-blue-400 font-medium bg-blue-500/10"
+                      : "text-zinc-400 hover:text-white hover:bg-white/4"
+                  }`}
                 >
                   Reference & Safety
                 </a>
-                <a
-                  href="#next-steps"
-                  className="block px-2 py-1.5 text-gray-400 hover:text-white hover:bg-[#21262d] rounded transition-colors"
-                >
-                  Troubleshooting
-                </a>
-
-                {/* Return to Main Site Button */}
-                {/* <div className="pt-3 mt-3 border-t border-outline/60">
-                  <Link
-                    to="/dashboard"
-                    className="w-full flex items-center justify-between px-2.5 py-2 text-xs font-medium text-gray-300 hover:text-white bg-[#161b22] hover:bg-[#21262d] border border-outline hover:border-blue-500/40 rounded-lg transition-all group shadow-xs cursor-pointer"
-                  >
-                    <span className="flex items-center gap-2">
-                      {/* <ArrowLeft size={13} className="text-gray-400 group-hover:text-blue-400 group-hover:-translate-x-0.5 transition-transform" /> */}
-                      {/* <span>Dashboard</span> */}
-                    {/* </span> */}
-                  {/* </Link> */}
-                {/* </div> */}
               </div>
             </nav>
           </aside>
@@ -367,47 +447,51 @@ npm update
         {/* Center Article Reading Column */}
         <main className="flex-1 min-w-0 px-4 py-8 sm:px-6 md:px-12 md:py-10 max-w-4xl">
           {/* Article Hero */}
-          <div className="pb-6 border-b border-outline mb-10">
-            <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight leading-tight">
+          <div className="pb-6 border-b border-white/8 mb-10">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-xs font-mono text-blue-400 font-semibold mb-4">
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+              <span>Developer Reference</span>
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
               Quickstart for Package Updates
             </h1>
-            <p className="text-base text-gray-400 mt-2 font-normal">
+            <p className="text-base text-zinc-400 mt-2 font-normal leading-relaxed">
               Inspect outdated dependencies, upgrade packages, and lock telemetry across all your project runtimes.
             </p>
           </div>
 
           {/* Section 1: Introduction */}
-          <section id="introduction" className="space-y-4 mb-12 scroll-mt-24 md:scroll-mt-20">
+          <section id="introduction" className="space-y-4 mb-14 scroll-mt-36">
             <div className="flex items-center gap-2 group">
-              <h2 className="text-2xl font-semibold text-white tracking-tight">
+              <h2 className="text-2xl font-bold text-white tracking-tight">
                 Introduction
               </h2>
               <a
                 href="#introduction"
-                className="opacity-0 group-hover:opacity-100 text-gray-500 hover:text-blue-400 transition-opacity"
+                className="opacity-0 group-hover:opacity-100 text-zinc-500 hover:text-blue-400 transition-opacity"
               >
                 <LinkIcon size={16} />
               </a>
             </div>
 
-            <p className="text-sm leading-relaxed text-gray-300">
-              In modern software projects, packages frequently release security patches, performance improvements, and bug fixes. PackPort connects with your background agent (<code className="text-blue-400 font-mono bg-[#161b22] px-1.5 py-0.5 rounded border border-outline">packport-agent</code>) to run package manager audits and keep versions up to date.
+            <p className="text-sm leading-relaxed text-zinc-300">
+              In modern software projects, packages frequently release security patches, performance improvements, and bug fixes. PackPort connects with your background agent (<code className="text-blue-400 font-mono bg-white/6 px-1.5 py-0.5 rounded border border-white/10">packport-agent</code>) to run package manager audits and keep versions up to date.
             </p>
 
-            <p className="text-sm leading-relaxed text-gray-300">
+            <p className="text-sm leading-relaxed text-zinc-300">
               From this guide, you will learn the standard CLI commands to check which packages are outdated, how to inspect differences in JSON format, and how to safely perform upgrades without breaking production lockfiles.
             </p>
           </section>
 
           {/* Section 2: Quickstart Steps */}
-          <section id="quickstart" className="space-y-6 mb-14 scroll-mt-24 md:scroll-mt-20">
+          <section id="quickstart" className="space-y-6 mb-14 scroll-mt-36">
             <div className="flex items-center gap-2 group">
-              <h2 className="text-2xl font-semibold text-white tracking-tight">
+              <h2 className="text-2xl font-bold text-white tracking-tight">
                 Quickstart commands
               </h2>
               <a
                 href="#quickstart"
-                className="opacity-0 group-hover:opacity-100 text-gray-500 hover:text-blue-400 transition-opacity"
+                className="opacity-0 group-hover:opacity-100 text-zinc-500 hover:text-blue-400 transition-opacity"
               >
                 <LinkIcon size={16} />
               </a>
@@ -423,15 +507,15 @@ npm update
                   <p className="text-sm font-semibold text-white">
                     Link your local machine using your Agent Code
                   </p>
-                  <p className="text-xs text-gray-400 mt-0.5">
+                  <p className="text-xs text-zinc-400 mt-0.5">
                     Copy your unique Agent Code from the Dashboard profile and pair your machine.
                   </p>
                 </div>
               </div>
 
               {/* Code Box */}
-              <div className="ml-9 rounded-lg bg-[#161b22] border border-outline overflow-hidden">
-                <div className="flex items-center justify-between px-4 py-2 border-b border-outline bg-[#1a202c]/50 text-xs font-mono text-gray-400">
+              <div className="ml-9 rounded-2xl bg-[#141620] border border-white/10 overflow-hidden shadow-lg">
+                <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/8 bg-[#181a26]/70 text-xs font-mono text-zinc-400">
                   <span className="flex items-center gap-2">
                     <Terminal size={13} className="text-blue-400" />
                     <span>Terminal</span>
@@ -443,7 +527,7 @@ npm update
                     {copiedId === "agent-sync" ? (
                       <>
                         <Check size={13} className="text-emerald-400" />
-                        <span className="text-emerald-400">Copied!</span>
+                        <span className="text-emerald-400 font-semibold">Copied!</span>
                       </>
                     ) : (
                       <>
@@ -454,10 +538,10 @@ npm update
                   </button>
                 </div>
                 <div className="p-4 font-mono text-xs text-emerald-400 select-all overflow-x-auto space-y-1">
-                  <div><span className="text-gray-500 select-none mr-2"># 1. Link machine once</span></div>
-                  <div><span className="text-gray-500 select-none mr-2">$</span>packport link &lt;your-agent-code&gt;</div>
-                  <div className="pt-2"><span className="text-gray-500 select-none mr-2"># 2. Start telemetry daemon</span></div>
-                  <div><span className="text-gray-500 select-none mr-2">$</span>packport start</div>
+                  <div><span className="text-zinc-500 select-none mr-2"># 1. Link machine once</span></div>
+                  <div><span className="text-zinc-500 select-none mr-2">$</span>packport link &lt;your-agent-code&gt;</div>
+                  <div className="pt-2"><span className="text-zinc-500 select-none mr-2"># 2. Start telemetry daemon</span></div>
+                  <div><span className="text-zinc-500 select-none mr-2">$</span>packport start</div>
                 </div>
               </div>
             </div>
@@ -472,8 +556,8 @@ npm update
                   <p className="text-sm font-semibold text-white">
                     Inspect outdated packages in your active environment
                   </p>
-                  <p className="text-xs text-gray-400 mt-0.5">
-                    Execute the language-specific inspection command below.
+                  <p className="text-xs text-zinc-400 mt-0.5">
+                    Execute the language-specific inspection commands below.
                   </p>
                 </div>
               </div>
@@ -481,26 +565,26 @@ npm update
           </section>
 
           {/* Section 3: Python */}
-          <section id="python-pip" className="space-y-5 mb-14 scroll-mt-24 md:scroll-mt-20 border-t border-outline pt-8">
+          <section id="python-pip" className="space-y-5 mb-14 scroll-mt-36 border-t border-white/8 pt-8">
             <div className="flex items-center gap-2 group">
-              <h2 className="text-2xl font-semibold text-white tracking-tight">
+              <h2 className="text-2xl font-bold text-white tracking-tight">
                 Python (pip & poetry)
               </h2>
               <a
                 href="#python-pip"
-                className="opacity-0 group-hover:opacity-100 text-gray-500 hover:text-blue-400 transition-opacity"
+                className="opacity-0 group-hover:opacity-100 text-zinc-500 hover:text-blue-400 transition-opacity"
               >
                 <LinkIcon size={16} />
               </a>
             </div>
 
-            <p className="text-sm text-gray-300 leading-relaxed">
-              Python packages managed by <code className="text-amber-300 font-mono bg-[#161b22] px-1 rounded border border-outline">pip</code> can report their versions directly as JSON:
+            <p className="text-sm text-zinc-300 leading-relaxed">
+              Python packages managed by <code className="text-sky-300 font-mono bg-white/6 px-1.5 py-0.5 rounded border border-white/10">pip</code> can report their versions directly as JSON:
             </p>
 
             {/* Command 1 */}
-            <div className="rounded-lg bg-[#161b22] border border-outline overflow-hidden">
-              <div className="flex items-center justify-between px-4 py-2 border-b border-outline bg-[#1a202c]/50 text-xs font-mono text-gray-400">
+            <div className="rounded-2xl bg-[#141620] border border-white/10 overflow-hidden shadow-lg">
+              <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/8 bg-[#181a26]/70 text-xs font-mono text-zinc-400">
                 <span>Check Outdated Packages (JSON Format)</span>
                 <button
                   onClick={() =>
@@ -517,14 +601,14 @@ npm update
                 </button>
               </div>
               <div className="p-4 font-mono text-xs text-emerald-400 select-all overflow-x-auto">
-                <span className="text-gray-500 select-none mr-2">$</span>
+                <span className="text-zinc-500 select-none mr-2">$</span>
                 python3 -m pip list --outdated --format=json
               </div>
             </div>
 
             {/* Command 2 */}
-            <div className="rounded-lg bg-[#161b22] border border-outline overflow-hidden">
-              <div className="flex items-center justify-between px-4 py-2 border-b border-outline bg-[#1a202c]/50 text-xs font-mono text-gray-400">
+            <div className="rounded-2xl bg-[#141620] border border-white/10 overflow-hidden shadow-lg">
+              <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/8 bg-[#181a26]/70 text-xs font-mono text-zinc-400">
                 <span>Upgrade Specific Package to Latest</span>
                 <button
                   onClick={() =>
@@ -541,32 +625,32 @@ npm update
                 </button>
               </div>
               <div className="p-4 font-mono text-xs text-emerald-400 select-all overflow-x-auto">
-                <span className="text-gray-500 select-none mr-2">$</span>
+                <span className="text-zinc-500 select-none mr-2">$</span>
                 python3 -m pip install --upgrade &lt;package_name&gt;
               </div>
             </div>
           </section>
 
           {/* Section 4: Node.js */}
-          <section id="nodejs-npm" className="space-y-5 mb-14 scroll-mt-24 md:scroll-mt-20 border-t border-outline pt-8">
+          <section id="nodejs-npm" className="space-y-5 mb-14 scroll-mt-36 border-t border-white/8 pt-8">
             <div className="flex items-center gap-2 group">
-              <h2 className="text-2xl font-semibold text-white tracking-tight">
+              <h2 className="text-2xl font-bold text-white tracking-tight">
                 Node.js (npm, pnpm, yarn, bun)
               </h2>
               <a
                 href="#nodejs-npm"
-                className="opacity-0 group-hover:opacity-100 text-gray-500 hover:text-blue-400 transition-opacity"
+                className="opacity-0 group-hover:opacity-100 text-zinc-500 hover:text-blue-400 transition-opacity"
               >
                 <LinkIcon size={16} />
               </a>
             </div>
 
-            <p className="text-sm text-gray-300 leading-relaxed">
-              In Node.js applications, use <code className="text-emerald-300 font-mono bg-[#161b22] px-1 rounded border border-outline">npm outdated</code> to view the currently installed version versus the maximum allowed by your <code className="text-gray-300 font-mono">package.json</code>:
+            <p className="text-sm text-zinc-300 leading-relaxed">
+              In Node.js applications, use <code className="text-emerald-300 font-mono bg-white/6 px-1.5 py-0.5 rounded border border-white/10">npm outdated</code> to view the currently installed version versus the maximum allowed by your <code className="text-zinc-300 font-mono">package.json</code>:
             </p>
 
-            <div className="rounded-lg bg-[#161b22] border border-outline overflow-hidden">
-              <div className="flex items-center justify-between px-4 py-2 border-b border-outline bg-[#1a202c]/50 text-xs font-mono text-gray-400">
+            <div className="rounded-2xl bg-[#141620] border border-white/10 overflow-hidden shadow-lg">
+              <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/8 bg-[#181a26]/70 text-xs font-mono text-zinc-400">
                 <span>Check npm Dependencies</span>
                 <button
                   onClick={() => handleCopy("npm outdated --json", "npm-out")}
@@ -581,13 +665,13 @@ npm update
                 </button>
               </div>
               <div className="p-4 font-mono text-xs text-emerald-400 select-all overflow-x-auto">
-                <span className="text-gray-500 select-none mr-2">$</span>
+                <span className="text-zinc-500 select-none mr-2">$</span>
                 npm outdated --json
               </div>
             </div>
 
-            <div className="rounded-lg bg-[#161b22] border border-outline overflow-hidden">
-              <div className="flex items-center justify-between px-4 py-2 border-b border-outline bg-[#1a202c]/50 text-xs font-mono text-gray-400">
+            <div className="rounded-2xl bg-[#141620] border border-white/10 overflow-hidden shadow-lg">
+              <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/8 bg-[#181a26]/70 text-xs font-mono text-zinc-400">
                 <span>Interactive Major Upgrade (npm-check-updates)</span>
                 <button
                   onClick={() => handleCopy("npx npm-check-updates -u && npm install", "ncu")}
@@ -602,28 +686,28 @@ npm update
                 </button>
               </div>
               <div className="p-4 font-mono text-xs text-emerald-400 select-all overflow-x-auto">
-                <span className="text-gray-500 select-none mr-2">$</span>
+                <span className="text-zinc-500 select-none mr-2">$</span>
                 npx npm-check-updates -u &amp;&amp; npm install
               </div>
             </div>
           </section>
 
           {/* Section 5: Rust */}
-          <section id="rust-cargo" className="space-y-5 mb-14 scroll-mt-24 md:scroll-mt-20 border-t border-outline pt-8">
+          <section id="rust-cargo" className="space-y-5 mb-14 scroll-mt-36 border-t border-white/8 pt-8">
             <div className="flex items-center gap-2 group">
-              <h2 className="text-2xl font-semibold text-white tracking-tight">
+              <h2 className="text-2xl font-bold text-white tracking-tight">
                 Rust (cargo)
               </h2>
               <a
                 href="#rust-cargo"
-                className="opacity-0 group-hover:opacity-100 text-gray-500 hover:text-blue-400 transition-opacity"
+                className="opacity-0 group-hover:opacity-100 text-zinc-500 hover:text-blue-400 transition-opacity"
               >
                 <LinkIcon size={16} />
               </a>
             </div>
 
-            <div className="rounded-lg bg-[#161b22] border border-outline overflow-hidden">
-              <div className="flex items-center justify-between px-4 py-2 border-b border-outline bg-[#1a202c]/50 text-xs font-mono text-gray-400">
+            <div className="rounded-2xl bg-[#141620] border border-white/10 overflow-hidden shadow-lg">
+              <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/8 bg-[#181a26]/70 text-xs font-mono text-zinc-400">
                 <span>Cargo Update</span>
                 <button
                   onClick={() => handleCopy("cargo update", "cargo-up")}
@@ -638,28 +722,28 @@ npm update
                 </button>
               </div>
               <div className="p-4 font-mono text-xs text-emerald-400 select-all overflow-x-auto">
-                <span className="text-gray-500 select-none mr-2">$</span>
+                <span className="text-zinc-500 select-none mr-2">$</span>
                 cargo update
               </div>
             </div>
           </section>
 
           {/* Section 6: Go */}
-          <section id="go-modules" className="space-y-5 mb-14 scroll-mt-24 md:scroll-mt-20 border-t border-outline pt-8">
+          <section id="go-modules" className="space-y-5 mb-14 scroll-mt-36 border-t border-white/8 pt-8">
             <div className="flex items-center gap-2 group">
-              <h2 className="text-2xl font-semibold text-white tracking-tight">
+              <h2 className="text-2xl font-bold text-white tracking-tight">
                 Go (modules)
               </h2>
               <a
                 href="#go-modules"
-                className="opacity-0 group-hover:opacity-100 text-gray-500 hover:text-blue-400 transition-opacity"
+                className="opacity-0 group-hover:opacity-100 text-zinc-500 hover:text-blue-400 transition-opacity"
               >
                 <LinkIcon size={16} />
               </a>
             </div>
 
-            <div className="rounded-lg bg-[#161b22] border border-outline overflow-hidden">
-              <div className="flex items-center justify-between px-4 py-2 border-b border-outline bg-[#1a202c]/50 text-xs font-mono text-gray-400">
+            <div className="rounded-2xl bg-[#141620] border border-white/10 overflow-hidden shadow-lg">
+              <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/8 bg-[#181a26]/70 text-xs font-mono text-zinc-400">
                 <span>Update Go Modules</span>
                 <button
                   onClick={() => handleCopy("go get -u ./... && go mod tidy", "go-up")}
@@ -674,47 +758,47 @@ npm update
                 </button>
               </div>
               <div className="p-4 font-mono text-xs text-emerald-400 select-all overflow-x-auto">
-                <span className="text-gray-500 select-none mr-2">$</span>
+                <span className="text-zinc-500 select-none mr-2">$</span>
                 go get -u ./... &amp;&amp; go mod tidy
               </div>
             </div>
           </section>
 
           {/* Section 7: Next Steps & Safety Alert */}
-          <section id="next-steps" className="space-y-5 mb-16 scroll-mt-24 md:scroll-mt-20 border-t border-outline pt-8">
+          <section id="next-steps" className="space-y-5 mb-16 scroll-mt-36 border-t border-white/8 pt-8">
             <div className="flex items-center gap-2 group">
-              <h2 className="text-2xl font-semibold text-white tracking-tight">
+              <h2 className="text-2xl font-bold text-white tracking-tight">
                 Next steps & best practices
               </h2>
               <a
                 href="#next-steps"
-                className="opacity-0 group-hover:opacity-100 text-gray-500 hover:text-blue-400 transition-opacity"
+                className="opacity-0 group-hover:opacity-100 text-zinc-500 hover:text-blue-400 transition-opacity"
               >
                 <LinkIcon size={16} />
               </a>
             </div>
 
-            <div className="rounded-xl bg-[#161b22] border border-outline p-5 space-y-3">
+            <div className="rounded-2xl bg-[#141620] border border-white/10 p-5 space-y-3 shadow-lg">
               <div className="flex items-center gap-2 text-blue-400 text-sm font-semibold">
                 <ShieldCheck size={18} />
                 <span>Verification & Lockfile Hygiene</span>
               </div>
-              <ul className="text-xs text-gray-300 space-y-2 list-disc list-inside leading-relaxed">
+              <ul className="text-xs text-zinc-300 space-y-2 list-disc list-inside leading-relaxed">
                 <li>Always run your automated test suite prior to committing version upgrades.</li>
-                <li>Ensure lockfiles (<code className="font-mono text-gray-200">package-lock.json</code>, <code className="font-mono text-gray-200">poetry.lock</code>, <code className="font-mono text-gray-200">Cargo.lock</code>) are checked into version control.</li>
+                <li>Ensure lockfiles (<code className="font-mono text-zinc-200 bg-white/6 px-1 rounded">package-lock.json</code>, <code className="font-mono text-zinc-200 bg-white/6 px-1 rounded">poetry.lock</code>, <code className="font-mono text-zinc-200 bg-white/6 px-1 rounded">Cargo.lock</code>) are checked into version control.</li>
                 <li>Use PackPort's telemetry agent to automatically monitor outdated packages across team machines.</li>
               </ul>
             </div>
           </section>
         </main>
 
-        {/* Right Sidebar: "In this article" (Sticky like GitHub Docs) */}
-        <aside className="w-64 shrink-0 p-6 hidden lg:block sticky top-12 h-[calc(100vh-48px)] overflow-y-auto">
+        {/* Right Sidebar: "In this article" (Sticky) */}
+        <aside className="w-64 shrink-0 p-6 hidden lg:block sticky top-28 h-[calc(100vh-112px)] overflow-y-auto">
           {/* Action button */}
           <div className="mb-6">
             <button
               onClick={() => handleCopy(fullMarkdownDoc, "copy-md")}
-              className="w-full flex items-center justify-between px-3 py-1.5 rounded-md bg-[#161b22] hover:bg-[#21262d] border border-outline text-xs font-medium text-gray-300 hover:text-white transition-colors cursor-pointer"
+              className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl bg-white/4 hover:bg-white/8 border border-white/8 text-xs font-medium text-zinc-300 hover:text-white transition-all cursor-pointer shadow-xs"
             >
               <div className="flex items-center gap-2">
                 <Copy size={13} />
@@ -731,27 +815,33 @@ npm update
           </h3>
 
           <ul className="space-y-2 text-xs">
-            {tocItems.map((item) => (
+            {filteredTocItems.map((item) => (
               <li key={item.id}>
                 <a
                   href={`#${item.id}`}
-                  className={`block transition-colors ${activeSection === item.id
-                      ? "text-blue-400 font-medium"
-                      : "text-gray-400 hover:text-gray-200"
-                    }`}
+                  className={`block transition-colors py-0.5 ${
+                    activeSection === item.id
+                      ? "text-blue-400 font-semibold"
+                      : "text-zinc-400 hover:text-zinc-200"
+                  }`}
                 >
                   {item.label}
                 </a>
               </li>
             ))}
+            {filteredTocItems.length === 0 && (
+              <li className="text-[11px] text-zinc-500 py-2">
+                No matching sections found.
+              </li>
+            )}
           </ul>
 
-          <div className="mt-8 pt-6 border-t border-outline space-y-2 text-xs text-gray-400">
+          <div className="mt-8 pt-6 border-t border-white/8 space-y-2 text-xs text-zinc-400">
             <a
-              href="https://github.com"
+              href="https://github.com/ShauryaG05/PackPort"
               target="_blank"
               rel="noreferrer"
-              className="flex items-center justify-between hover:text-white transition-colors"
+              className="flex items-center justify-between hover:text-white transition-colors py-1"
             >
               <span>View PackPort on GitHub</span>
               <ExternalLink size={12} />
