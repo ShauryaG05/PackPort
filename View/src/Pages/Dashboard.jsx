@@ -26,6 +26,9 @@ import {
   ChevronRight,
   Send,
   Menu,
+  LayoutDashboard,
+  Download,
+  Info,
 } from "lucide-react";
 import ActiveUpdateSection from "../components/ActiveUpdateSection";
 import PackPortLogo from "../components/PackPortLogo";
@@ -586,39 +589,46 @@ export default function Dashboard() {
         </div>
 
         {/* Center: Floating Capsule Pill Navigation to Important Pages */}
-        <nav className="hidden xl:flex items-center bg-[#1c1f26] border border-white/8 rounded-full p-1 shadow-inner gap-1">
+        <nav
+          className="hidden md:flex items-center bg-[#12141c]/90 border border-white/10 rounded-full p-1 shadow-[0_4px_24px_rgba(0,0,0,0.5)] backdrop-blur-md gap-0.5"
+          aria-label="Main Navigation"
+        >
           <Link
             to="/dashboard"
-            className="px-4 py-1.5 rounded-full text-xs font-semibold bg-[#282c35] text-white shadow-xs border border-white/8 transition-all"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-[#252a36] text-white border border-white/12 shadow-inner transition-colors"
           >
-            Dashboard
+            <LayoutDashboard size={14} className="text-blue-400" />
+            <span>Dashboard</span>
           </Link>
           <Link
             to="/docs/cli"
-            className="px-4 py-1.5 rounded-full text-xs font-medium text-gray-400 hover:text-white hover:bg-white/4 transition-all"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold text-zinc-400 hover:text-white hover:bg-white/4 transition-colors"
           >
-            CLI Docs
+            <Terminal size={14} className="text-zinc-400" />
+            <span>Docs</span>
           </Link>
           <Link
             to="/download"
-            className="px-4 py-1.5 rounded-full text-xs font-medium text-gray-400 hover:text-white hover:bg-white/4 transition-all"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold text-zinc-400 hover:text-white hover:bg-white/4 transition-colors"
           >
-            Download
+            <Download size={14} className="text-zinc-400" />
+            <span>Download</span>
           </Link>
           <Link
             to="/about"
-            className="px-4 py-1.5 rounded-full text-xs font-medium text-gray-400 hover:text-white hover:bg-white/4 transition-all"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold text-zinc-400 hover:text-white hover:bg-white/4 transition-colors"
           >
-            About Us
+            <Info size={14} className="text-zinc-400" />
+            <span>About Us</span>
           </Link>
           <a
             href="https://github.com/ShauryaG05/PackPort"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-medium text-gray-400 hover:text-white hover:bg-white/4 transition-all"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-zinc-400 hover:text-white hover:bg-white/4 transition-colors"
           >
-            <GithubIcon size={13} />
-            <span>GitHub</span>
+            <GithubIcon size={14} className="text-zinc-400" />
+            <span className="hidden lg:inline">GitHub</span>
           </a>
         </nav>
 
