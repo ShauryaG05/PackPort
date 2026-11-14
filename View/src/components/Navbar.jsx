@@ -3,34 +3,30 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import PackPortLogo from "./PackPortLogo";
 import {
+  LayoutDashboard,
   Terminal,
+  Download,
+  Info,
   ArrowRight,
   ChevronDown,
-  Cpu,
-  Layers,
-  Activity,
-  ShieldCheck,
-  Zap,
-  Boxes,
-  FileCode,
-  User,
-  Download,
-  BookOpen,
-  Sliders,
   LogOut,
   LogIn,
   Menu,
   X,
-  Sparkles,
-  Cable,
-  LayoutDashboard,
-  ChevronRight,
+  ExternalLink,
+  User,
   Bell,
-  HardDrive,
-  Database,
-  Info
+  Check,
+  Shield,
+  Layers,
+  Sparkles,
 } from "lucide-react";
-import { getAuthHeaders, clearAuthSession, setAuthSession } from "../lib/auth";
+import {
+  getAuthHeaders,
+  clearAuthSession,
+  setAuthSession,
+  getStoredUser,
+} from "../lib/auth";
 
 export function GithubIcon({ size = 16, className = "" }) {
   return (
@@ -60,8 +56,10 @@ export function PythonIcon({ size = 18, className = "" }) {
         background: "#38bdf8",
         width: size,
         height: size,
-        WebkitMaskImage: 'url("https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/webp/python.webp")',
-        maskImage: 'url("https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/webp/python.webp")',
+        WebkitMaskImage:
+          'url("https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/webp/python.webp")',
+        maskImage:
+          'url("https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/webp/python.webp")',
         WebkitMaskRepeat: "no-repeat",
         maskRepeat: "no-repeat",
         WebkitMaskPosition: "center",
@@ -83,8 +81,10 @@ export function NodeIcon({ size = 18, className = "" }) {
         background: "#4ade80",
         width: size,
         height: size,
-        WebkitMaskImage: 'url("https://cdn.simpleicons.org/nodedotjs/5FA04E")',
-        maskImage: 'url("https://cdn.simpleicons.org/nodedotjs/5FA04E")',
+        WebkitMaskImage:
+          'url("https://cdn.simpleicons.org/nodedotjs/5FA04E")',
+        maskImage:
+          'url("https://cdn.simpleicons.org/nodedotjs/5FA04E")',
         WebkitMaskRepeat: "no-repeat",
         maskRepeat: "no-repeat",
         WebkitMaskPosition: "center",
@@ -106,8 +106,10 @@ export function OllamaIcon({ size = 18, className = "" }) {
         background: "#e2e8f0",
         width: size,
         height: size,
-        WebkitMaskImage: 'url("https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/ollama.svg")',
-        maskImage: 'url("https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/ollama.svg")',
+        WebkitMaskImage:
+          'url("https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/ollama.svg")',
+        maskImage:
+          'url("https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/ollama.svg")',
         WebkitMaskRepeat: "no-repeat",
         maskRepeat: "no-repeat",
         WebkitMaskPosition: "center",
@@ -128,37 +130,40 @@ export default function Navbar({
   user: propUser,
   onLogout: propOnLogout,
 }) {
-  const [activeDropdown, setActiveDropdown] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [mobileExpanded, setMobileExpanded] = useState({});
-  const [internalUser, setInternalUser] = useState(null);
-  const [internalAuth, setInternalAuth] = useState(false);
-  const navContainerRef = useRef(null);
-  const closeTimeoutRef = useRef(null);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [internalUser, setInternalUser] = useState(() => getStoredUser() || null);
+  const [internalAuth, setInternalAuth] = useState(() => Boolean(getStoredUser()));
+  const profileMenuRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
 
   const isAuth = propAuth !== undefined ? propAuth : internalAuth;
   const currentUser = propUser || internalUser;
 
-  // Check auth if not passed via props
+  // Check auth status asynchronously on mount if not passed as prop
   useEffect(() => {
     let isMounted = true;
     if (propUser) {
       setInternalUser(propUser);
     }
+
     if (propAuth === undefined) {
       async function checkAuthStatus() {
         try {
           const backendUrl =
             import.meta.env.VITE_BACKEND_URL ||
             import.meta.env.VITE_URL ||
-            (import.meta.env.PROD ? "https://packport.onrender.com" : "http://localhost:5600");
+            (import.meta.env.PROD
+              ? "https://packport.onrender.com"
+              : "http://localhost:5600");
+
           const response = await fetch(`${backendUrl}/auth/check`, {
             method: "GET",
             headers: getAuthHeaders(),
             credentials: "include",
           });
+
           const data = await response.json();
           if (isMounted) {
             if (data.status) {
@@ -185,6 +190,7 @@ export default function Navbar({
       }
       checkAuthStatus();
     }
+
     return () => {
       isMounted = false;
     };
@@ -194,14 +200,17 @@ export default function Navbar({
   async function handleLogout() {
     if (propOnLogout) {
       propOnLogout();
-      setActiveDropdown(null);
+      setProfileDropdownOpen(false);
       return;
     }
     try {
       const backendUrl =
         import.meta.env.VITE_BACKEND_URL ||
         import.meta.env.VITE_URL ||
-        (import.meta.env.PROD ? "https://packport.onrender.com" : "http://localhost:5600");
+        (import.meta.env.PROD
+          ? "https://packport.onrender.com"
+          : "http://localhost:5600");
+
       await fetch(`${backendUrl}/auth/logout`, {
         method: "GET",
         headers: getAuthHeaders(),
@@ -214,37 +223,36 @@ export default function Navbar({
       setInternalAuth(false);
       if (propSetAuth) propSetAuth(false);
       setInternalUser(null);
-      setActiveDropdown(null);
+      setProfileDropdownOpen(false);
       navigate("/auth/login");
     }
   }
 
-  // Hover delay handlers to prevent accidental closes
-  const handleMouseEnter = (key) => {
-    if (closeTimeoutRef.current) {
-      clearTimeout(closeTimeoutRef.current);
-      closeTimeoutRef.current = null;
-    }
-    setActiveDropdown(key);
-  };
-
-  const handleMouseLeave = () => {
-    closeTimeoutRef.current = setTimeout(() => {
-      setActiveDropdown(null);
-    }, 180);
-  };
-
   // Close menus on route change
   useEffect(() => {
-    setActiveDropdown(null);
+    setProfileDropdownOpen(false);
     setMobileMenuOpen(false);
   }, [location.pathname]);
 
-  // Close on escape key
+  // Click outside listener for profile dropdown
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        profileMenuRef.current &&
+        !profileMenuRef.current.contains(event.target)
+      ) {
+        setProfileDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Close menus on Escape key
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "Escape") {
-        setActiveDropdown(null);
+        setProfileDropdownOpen(false);
         setMobileMenuOpen(false);
       }
     };
@@ -252,611 +260,306 @@ export default function Navbar({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  const toggleMobileSubmenu = (key) => {
-    setMobileExpanded((prev) => ({ ...prev, [key]: !prev[key] }));
-  };
+  // Standard navigation links across the entire site
+  const navLinks = [
+    {
+      name: "Dashboard",
+      to: "/dashboard",
+      icon: LayoutDashboard,
+      isActive: location.pathname === "/dashboard",
+    },
+    {
+      name: "Docs",
+      to: "/docs/cli",
+      icon: Terminal,
+      isActive: location.pathname.startsWith("/docs"),
+    },
+    {
+      name: "Download",
+      to: "/download",
+      icon: Download,
+      isActive: location.pathname === "/download",
+    },
+    {
+      name: "About Us",
+      to: "/about",
+      icon: Info,
+      isActive: location.pathname === "/about",
+    },
+    {
+      name: "GitHub",
+      href: "https://github.com/ShauryaG05/PackPort",
+      icon: GithubIcon,
+      isExternal: true,
+    },
+  ];
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-[#08090d]/90 backdrop-blur-xl border-b border-white/8 select-none">
-      <div
-        ref={navContainerRef}
-        onMouseLeave={handleMouseLeave}
-        className="w-full px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between relative"
-      >
-        {/* 1. Left Side: Logo shifted to the left edge or Dashboard status */}
-        <div className="flex items-center shrink-0">
-          {isDashboard ? (
-            onToggleSidebar && (
-              <button
-                type="button"
-                onClick={onToggleSidebar}
-                className="md:hidden p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/6 transition-colors cursor-pointer"
-                aria-label="Open sidebar"
-              >
-                <Menu size={20} />
-              </button>
-            )
-          ) : (
-            <Link
-              to="/"
-              className="flex items-center gap-2.5 hover:opacity-90 transition-opacity focus:outline-none"
-              aria-label="PackPort Home"
+    <header className="sticky top-0 z-50 w-full bg-[#08090d]/85 backdrop-blur-xl border-b border-white/8 select-none transition-colors duration-200">
+      {/* Top subtle glow line */}
+      <div className="absolute top-0 inset-x-0 h-px bg-linear-to-r from-transparent via-blue-500/25 to-transparent pointer-events-none" />
+
+      <div className="w-full px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between relative">
+        {/* 1. Left Side: Brand Logo or Mobile Sidebar Toggle */}
+        <div className="flex items-center gap-3 shrink-0">
+          {isDashboard && onToggleSidebar && (
+            <button
+              type="button"
+              onClick={onToggleSidebar}
+              className="md:hidden p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-white/6 transition-colors cursor-pointer"
+              aria-label="Open sidebar"
             >
-              <PackPortLogo size={32} showBadge={false} />
-            </Link>
+              <Menu size={20} />
+            </button>
           )}
+
+          <Link
+            to="/"
+            className="flex items-center gap-2.5 hover:opacity-95 transition-opacity focus:outline-none group"
+            aria-label="PackPort Home"
+          >
+            <PackPortLogo size={30} showBadge={false} />
+            <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-[10px] font-mono text-blue-400 tracking-wide">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span>v1.2</span>
+            </span>
+          </Link>
         </div>
 
-        {/* 2. Center Navigation: Mathematically centered in the menu bar with direct links to important pages */}
-        <nav className="hidden xl:flex items-center gap-1 absolute left-1/2 -translate-x-1/2 bg-[#14161d] border border-white/8 rounded-full p-1 shadow-inner">
-          <Link
-            to="/dashboard"
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-150 ${
-              location.pathname === "/dashboard"
-                ? "bg-[#282c35] text-white shadow-xs border border-white/8"
-                : "text-zinc-400 hover:text-white hover:bg-white/4"
-            }`}
-          >
-            <LayoutDashboard size={14} className={location.pathname === "/dashboard" ? "text-primary" : "text-zinc-400"} />
-            <span>Dashboard</span>
-          </Link>
+        {/* 2. Center Navigation: Floating Capsule Nav Bar with Smooth Spring Animation */}
+        <nav
+          className="hidden md:flex items-center absolute left-1/2 -translate-x-1/2 bg-[#12141c]/90 border border-white/10 rounded-full p-1 shadow-[0_4px_24px_rgba(0,0,0,0.5)] backdrop-blur-md gap-0.5"
+          aria-label="Main Navigation"
+        >
+          {navLinks.map((item) => {
+            const Icon = item.icon;
+            if (item.isExternal) {
+              return (
+                <a
+                  key={item.name}
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-zinc-400 hover:text-white hover:bg-white/4 transition-colors"
+                >
+                  <Icon size={14} className="text-zinc-400" />
+                  <span className="hidden lg:inline">{item.name}</span>
+                </a>
+              );
+            }
 
-          <Link
-            to="/docs/cli"
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-150 ${
-              location.pathname.startsWith("/docs")
-                ? "bg-[#282c35] text-white shadow-xs border border-white/8"
-                : "text-zinc-400 hover:text-white hover:bg-white/4"
-            }`}
-          >
-            <Terminal size={14} className={location.pathname.startsWith("/docs") ? "text-primary" : "text-zinc-400"} />
-            <span>Docs</span>
-          </Link>
-
-          <Link
-            to="/download"
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-150 ${
-              location.pathname === "/download"
-                ? "bg-[#282c35] text-white shadow-xs border border-white/8"
-                : "text-zinc-400 hover:text-white hover:bg-white/4"
-            }`}
-          >
-            <Download size={14} className={location.pathname === "/download" ? "text-primary" : "text-zinc-400"} />
-            <span>Download</span>
-          </Link>
-
-          <Link
-            to="/about"
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-150 ${
-              location.pathname === "/about"
-                ? "bg-[#282c35] text-white shadow-xs border border-white/8"
-                : "text-zinc-400 hover:text-white hover:bg-white/4"
-            }`}
-          >
-            <Info size={14} className={location.pathname === "/about" ? "text-primary" : "text-zinc-400"} />
-            <span>About Us</span>
-          </Link>
-
-          <a
-            href="https://github.com/ShauryaG05/PackPort"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold text-zinc-400 hover:text-white hover:bg-white/4 transition-all duration-150"
-          >
-            <GithubIcon size={14} />
-            <span>GitHub</span>
-          </a>
+            return (
+              <Link
+                key={item.name}
+                to={item.to}
+                className={`relative flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-colors duration-150 ${
+                  item.isActive
+                    ? "text-white"
+                    : "text-zinc-400 hover:text-white hover:bg-white/4"
+                }`}
+              >
+                {item.isActive && (
+                  <motion.span
+                    layoutId="navbar-active-pill"
+                    className="absolute inset-0 bg-[#252a36] border border-white/12 rounded-full shadow-inner"
+                    transition={{
+                      type: "spring",
+                      stiffness: 400,
+                      damping: 32,
+                    }}
+                  />
+                )}
+                <span className="relative z-10 flex items-center gap-1.5">
+                  <Icon
+                    size={14}
+                    className={
+                      item.isActive
+                        ? "text-blue-400"
+                        : "text-zinc-400 group-hover:text-zinc-200"
+                    }
+                  />
+                  <span>{item.name}</span>
+                </span>
+              </Link>
+            );
+          })}
         </nav>
 
-        {/* 3. Right Action Items */}
-        <div className="hidden xl:flex items-center gap-3 shrink-0">
-          {/* Docs Link */}
-          <Link
-            to="/docs/cli"
-            className="flex items-center gap-1.5 text-xs sm:text-sm font-medium text-zinc-300 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-white/4"
-          >
-            <BookOpen className="w-4 h-4 text-zinc-400" />
-            <span>Docs</span>
-          </Link>
-
-          {/* Sign In Button with styled Background (when unauthenticated) */}
-          {!isAuth ? (
+        {/* 3. Right Action Items: Auth & User Profile */}
+        <div className="flex items-center gap-2.5 shrink-0">
+          {/* Quick Docs Link for Compact Desktop (visible only when not on docs) */}
+          {!location.pathname.startsWith("/docs") && (
             <Link
-              to="/auth/login"
-              className="flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-white bg-[#6366f1] hover:bg-[#5457e5] px-4 py-2 rounded-xl transition-all shadow-[0_0_18px_rgba(99,102,241,0.35)] hover:shadow-[0_0_25px_rgba(99,102,241,0.55)] active:scale-[0.98] cursor-pointer"
+              to="/docs/cli"
+              className="hidden xl:inline-flex items-center gap-1.5 text-xs font-medium text-zinc-400 hover:text-white px-3 py-1.5 rounded-full hover:bg-white/4 transition-colors"
             >
-              <LogIn className="w-4 h-4" />
-              <span>Sign In</span>
+              <Terminal size={13} className="text-zinc-500" />
+              <span>CLI Guide</span>
             </Link>
+          )}
+
+          {/* Unauthenticated View: Sign In CTA Button */}
+          {!isAuth ? (
+            <div className="flex items-center gap-2">
+              <Link
+                to="/auth/login"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-primary hover:bg-primary-container px-3.5 py-1.5 rounded-xl transition-all shadow-[0_0_16px_rgba(37,99,235,0.35)] hover:shadow-[0_0_22px_rgba(37,99,235,0.55)] active:scale-95 cursor-pointer border border-primary/40"
+              >
+                <LogIn size={13} />
+                <span>Sign In</span>
+              </Link>
+            </div>
           ) : (
-            /* Authenticated view */
-            <div className="flex items-center gap-2.5">
-              {isDashboard && (
+            /* Authenticated View: User Avatar with Interactive Popover Menu */
+            <div className="relative" ref={profileMenuRef}>
+              <div className="flex items-center gap-2">
+                {/* Dashboard Shortcut Button (on non-dashboard pages) */}
+                {location.pathname !== "/dashboard" && (
+                  <Link
+                    to="/dashboard"
+                    className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-primary hover:bg-primary-container transition-all shadow-xs active:scale-95"
+                  >
+                    <span>Dashboard</span>
+                    <ArrowRight size={13} />
+                  </Link>
+                )}
+
+                {/* Profile Pill Trigger */}
                 <button
                   type="button"
-                  className="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-white/6 transition-colors relative"
-                  title="Notifications"
+                  onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                  className={`flex items-center gap-2 px-2.5 py-1.5 rounded-xl border transition-all cursor-pointer ${
+                    profileDropdownOpen
+                      ? "bg-white/10 border-white/20 text-white"
+                      : "bg-white/4 hover:bg-white/8 border-white/8 text-zinc-200"
+                  }`}
+                  aria-expanded={profileDropdownOpen}
+                  aria-haspopup="true"
+                  title="Account Settings"
                 >
-                  <Bell size={17} />
-                  <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                  <div className="w-6 h-6 rounded-full bg-linear-to-tr from-blue-500 via-indigo-500 to-cyan-400 p-[1.5px] shrink-0">
+                    <div className="w-full h-full rounded-full bg-[#111317] flex items-center justify-center font-bold text-[11px] text-blue-300">
+                      {currentUser?.name
+                        ? currentUser.name[0].toUpperCase()
+                        : currentUser?.email
+                        ? currentUser.email[0].toUpperCase()
+                        : "U"}
+                    </div>
+                  </div>
+                  <span className="hidden sm:inline max-w-28 truncate text-xs font-medium">
+                    {currentUser?.name || "Profile"}
+                  </span>
+                  <ChevronDown
+                    size={13}
+                    className={`text-zinc-400 transition-transform duration-200 ${
+                      profileDropdownOpen ? "rotate-180 text-white" : ""
+                    }`}
+                  />
                 </button>
-              )}
+              </div>
 
-              <Link
-                to="/user"
-                className="flex items-center gap-2 text-xs sm:text-sm font-medium text-zinc-200 hover:text-white transition-colors px-2.5 py-1.5 rounded-xl bg-white/4 hover:bg-white/8 border border-white/8"
-              >
-                <div className="w-6 h-6 rounded-full bg-indigo-500/20 border border-indigo-500/40 text-[11px] font-bold text-indigo-400 flex items-center justify-center">
-                  {currentUser?.name ? currentUser.name[0].toUpperCase() : "U"}
-                </div>
-                <span className="max-w-27.5 truncate">{currentUser?.name || "Profile"}</span>
-              </Link>
+              {/* Profile Dropdown Menu */}
+              <AnimatePresence>
+                {profileDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 6, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 4, scale: 0.98 }}
+                    transition={{ duration: 0.15, ease: "easeOut" }}
+                    className="absolute right-0 mt-2 w-64 rounded-2xl bg-[#11131a]/98 backdrop-blur-2xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.8)] p-2 z-50 text-left"
+                  >
+                    {/* User summary card */}
+                    <div className="p-3 rounded-xl bg-white/4 border border-white/6 mb-1.5">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-full bg-blue-500/20 border border-blue-500/40 text-blue-400 font-bold text-xs flex items-center justify-center shrink-0">
+                          {currentUser?.name
+                            ? currentUser.name[0].toUpperCase()
+                            : "U"}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-semibold text-white truncate">
+                            {currentUser?.name || "Developer"}
+                          </p>
+                          <p className="text-[10px] text-zinc-400 font-mono truncate">
+                            {currentUser?.email || "Local Workstation"}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="mt-2 pt-2 border-t border-white/6 flex items-center justify-between text-[10px] font-mono">
+                        <span className="text-zinc-500">Agent Status</span>
+                        <span className="inline-flex items-center gap-1 text-emerald-400 font-medium">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                          Online
+                        </span>
+                      </div>
+                    </div>
 
-              {!isDashboard && (
-                <Link
-                  to="/dashboard"
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold text-white bg-[#6366f1] hover:bg-[#5457e5] transition-all shadow-sm"
-                >
-                  <span>Dashboard</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              )}
+                    {/* Quick navigation links */}
+                    <div className="space-y-0.5 text-xs">
+                      <Link
+                        to="/dashboard"
+                        onClick={() => setProfileDropdownOpen(false)}
+                        className="flex items-center gap-2 px-3 py-2 rounded-xl text-zinc-300 hover:text-white hover:bg-white/6 transition-colors"
+                      >
+                        <LayoutDashboard size={14} className="text-blue-400" />
+                        <span>Workstation Dashboard</span>
+                      </Link>
+
+                      <Link
+                        to="/user"
+                        onClick={() => setProfileDropdownOpen(false)}
+                        className="flex items-center gap-2 px-3 py-2 rounded-xl text-zinc-300 hover:text-white hover:bg-white/6 transition-colors"
+                      >
+                        <User size={14} className="text-indigo-400" />
+                        <span>Telemetry Profile & API</span>
+                      </Link>
+
+                      <Link
+                        to="/package/python"
+                        onClick={() => setProfileDropdownOpen(false)}
+                        className="flex items-center gap-2 px-3 py-2 rounded-xl text-zinc-300 hover:text-white hover:bg-white/6 transition-colors"
+                      >
+                        <Layers size={14} className="text-emerald-400" />
+                        <span>Monitored Packages</span>
+                      </Link>
+
+                      <Link
+                        to="/docs/cli"
+                        onClick={() => setProfileDropdownOpen(false)}
+                        className="flex items-center gap-2 px-3 py-2 rounded-xl text-zinc-300 hover:text-white hover:bg-white/6 transition-colors"
+                      >
+                        <Terminal size={14} className="text-amber-400" />
+                        <span>CLI Terminal Guide</span>
+                      </Link>
+                    </div>
+
+                    {/* Sign Out Button */}
+                    <div className="mt-1.5 pt-1.5 border-t border-white/6">
+                      <button
+                        type="button"
+                        onClick={handleLogout}
+                        className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors cursor-pointer"
+                      >
+                        <LogOut size={14} />
+                        <span>Sign Out of Session</span>
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           )}
-        </div>
 
-        {/* Mobile Hamburger Button */}
-        <div className="xl:hidden flex items-center gap-2">
-          {!isAuth ? (
-            <Link
-              to="/auth/login"
-              className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-[#6366f1]"
-            >
-              Sign In
-            </Link>
-          ) : !isDashboard ? (
-            <Link
-              to="/dashboard"
-              className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-[#6366f1]"
-            >
-              Dashboard
-            </Link>
-          ) : (
-            <Link
-              to="/user"
-              className="flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs font-medium text-zinc-200 bg-white/6 border border-white/8"
-            >
-              <div className="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 text-[10px] font-bold flex items-center justify-center">
-                {currentUser?.name ? currentUser.name[0].toUpperCase() : "U"}
-              </div>
-            </Link>
-          )}
-
+          {/* Mobile Menu Hamburger Toggle */}
           <button
+            type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-white/6 transition-colors cursor-pointer"
+            className="md:hidden p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-white/6 transition-colors cursor-pointer"
             aria-label="Toggle Navigation Menu"
           >
-            {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
-
-        {/* ── MEGA MENU DROPDOWN PANEL (Desktop) ── */}
-        <AnimatePresence>
-          {activeDropdown && (
-            <motion.div
-              key="mega-menu"
-              initial={{ opacity: 0, y: 8, scale: 0.99 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 6, scale: 0.99 }}
-              transition={{ duration: 0.18, ease: "easeOut" }}
-              onMouseEnter={() => handleMouseEnter(activeDropdown)}
-              onMouseLeave={handleMouseLeave}
-              className={`absolute left-1/2 -translate-x-1/2 top-full mt-2 w-[94vw] ${
-                isDashboard ? "max-w-4xl" : "max-w-5xl"
-              } bg-[#0c0d12]/95 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] p-6 z-50 overflow-hidden text-left`}
-            >
-              {/* Invisible top hover bridge */}
-              <div className="absolute -top-3 left-0 right-0 h-3" />
-
-              {/* Subtle top reflection line */}
-              <div className="absolute top-0 inset-x-8 h-px bg-linear-to-r from-transparent via-white/20 to-transparent" />
-
-              {/* 1. RUNTIMES DROPDOWN */}
-              {activeDropdown === "runtimes" && (
-                <div className="grid grid-cols-12 gap-6 items-stretch">
-                  <div className="col-span-8 grid grid-cols-3 gap-5">
-                    {/* Column 1: RUNTIMES */}
-                    <div>
-                      <p className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 mb-3 px-2">
-                        Runtimes
-                      </p>
-                      <div className="space-y-1">
-                        <DropdownItem
-                          to="/package/python"
-                          icon={<PythonIcon size={16} />}
-                          iconBg="bg-sky-500/10 border-sky-500/20 text-sky-400"
-                          title="Python"
-                          desc="Pip packages & venvs"
-                        />
-                        <DropdownItem
-                          to="/package/node"
-                          icon={<NodeIcon size={16} />}
-                          iconBg="bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
-                          title="Node.js"
-                          desc="npm, yarn, pnpm packages"
-                        />
-                        <DropdownItem
-                          to="/package/ollama"
-                          icon={<OllamaIcon size={16} />}
-                          iconBg="bg-slate-400/10 border-slate-400/20 text-slate-300"
-                          title="Ollama AI"
-                          desc="Local model weights & RAM"
-                        />
-                        <DropdownItem
-                          to="/docs/cli#rust-cargo"
-                          icon={<Boxes className="w-4 h-4 text-orange-400" />}
-                          iconBg="bg-orange-500/10 border-orange-500/20"
-                          title="Rust Cargo"
-                          desc="Crates & compilation drift"
-                        />
-                        <DropdownItem
-                          to="/docs/cli#go-modules"
-                          icon={<FileCode className="w-4 h-4 text-cyan-400" />}
-                          iconBg="bg-cyan-500/10 border-cyan-500/20"
-                          title="Go Modules"
-                          desc="Binary caches & packages"
-                        />
-                      </div>
-
-                      <div className="pt-3 px-2">
-                        <Link
-                          to="/package/python"
-                          className="text-[11px] font-bold tracking-wider text-zinc-400 hover:text-white inline-flex items-center gap-1 transition-colors"
-                        >
-                          <span>VIEW ALL RUNTIMES</span>
-                          <ChevronRight className="w-3 h-3" />
-                        </Link>
-                      </div>
-                    </div>
-
-                    {/* Column 2: PACKAGE OBSERVABILITY */}
-                    <div>
-                      <p className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 mb-3 px-2">
-                        Auditing
-                      </p>
-                      <div className="space-y-1">
-                        <DropdownItem
-                          to="/package/python"
-                          icon={<Layers className="w-4 h-4 text-amber-400" />}
-                          iconBg="bg-amber-500/10 border-amber-500/20"
-                          title="Dependency Drift"
-                          desc="Outdated module alerts"
-                        />
-                        <DropdownItem
-                          to="/dashboard"
-                          icon={<Cpu className="w-4 h-4 text-purple-400" />}
-                          iconBg="bg-purple-500/10 border-purple-500/20"
-                          title="V8 & Runtime Engine"
-                          desc="Node.js and Python builds"
-                        />
-                        <DropdownItem
-                          to="/package/node"
-                          icon={<Database className="w-4 h-4 text-blue-400" />}
-                          iconBg="bg-blue-500/10 border-blue-500/20"
-                          title="Global Packages"
-                          desc="CLI binaries & caches"
-                        />
-                        <DropdownItem
-                          to="/dashboard"
-                          icon={<Activity className="w-4 h-4 text-emerald-400" />}
-                          iconBg="bg-emerald-500/10 border-emerald-500/20"
-                          title="Telemetry Status"
-                          desc="Continuous monitoring"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Column 3: DEVELOPER TOOLS */}
-                    <div>
-                      <p className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 mb-3 px-2">
-                        Developer Tools
-                      </p>
-                      <div className="space-y-1">
-                        <DropdownItem
-                          to="/docs/cli"
-                          icon={<Terminal className="w-4 h-4 text-fuchsia-400" />}
-                          iconBg="bg-fuchsia-500/10 border-fuchsia-500/20"
-                          title="Terminal Daemon"
-                          desc="Single-command sync"
-                        />
-                        <DropdownItem
-                          to="/docs/cli#quickstart"
-                          icon={<Zap className="w-4 h-4 text-yellow-400" />}
-                          iconBg="bg-yellow-500/10 border-yellow-500/20"
-                          title="Agent Sync API"
-                          desc="Telemetry packet protocol"
-                        />
-                        <DropdownItem
-                          to="/download"
-                          icon={<Download className="w-4 h-4 text-indigo-400" />}
-                          iconBg="bg-indigo-500/10 border-indigo-500/20"
-                          title="Desktop Binaries"
-                          desc="macOS, Win & Linux"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Right Featured Card */}
-                  <div className="col-span-4">
-                    <FeaturedPreviewCard
-                      tag1="Primary / 6"
-                      tag2="16px"
-                      title="Advance UI Customization"
-                      subtitle="Personalize your collaboration and telemetry experience."
-                      primaryBtnText="View Docs"
-                      primaryBtnLink="/docs/cli"
-                      secondaryBtnText="Downloads"
-                      secondaryBtnLink="/download"
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* 2. RESOURCES & DOCS DROPDOWN */}
-              {activeDropdown === "resources" && (
-                <div className="grid grid-cols-12 gap-6 items-stretch">
-                  <div className="col-span-8 grid grid-cols-2 gap-6">
-                    <div>
-                      <p className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 mb-3 px-2">
-                        Documentation
-                      </p>
-                      <div className="space-y-1">
-                        <DropdownItem
-                          to="/docs/cli"
-                          icon={<Terminal className="w-4 h-4 text-sky-400" />}
-                          iconBg="bg-sky-500/10 border-sky-500/20"
-                          title="CLI Documentation"
-                          desc="Complete command line tool reference"
-                        />
-                        <DropdownItem
-                          to="/docs/cli#quickstart"
-                          icon={<Zap className="w-4 h-4 text-yellow-400" />}
-                          iconBg="bg-yellow-500/10 border-yellow-500/20"
-                          title="Quickstart Guide"
-                          desc="Set up telemetry in under 60 seconds"
-                        />
-                        <DropdownItem
-                          to="/docs/cli#python-pip"
-                          icon={<PythonIcon size={16} />}
-                          iconBg="bg-blue-500/10 border-blue-500/20"
-                          title="Python Pip Auditing"
-                          desc="Pip, poetry, and virtualenv telemetry"
-                        />
-                        <DropdownItem
-                          to="/docs/cli#nodejs-npm"
-                          icon={<NodeIcon size={16} />}
-                          iconBg="bg-emerald-500/10 border-emerald-500/20"
-                          title="Node.js npm Auditing"
-                          desc="npm, yarn, pnpm, and Bun support"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <p className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 mb-3 px-2">
-                        System & Releases
-                      </p>
-                      <div className="space-y-1">
-                        <DropdownItem
-                          to="/download"
-                          icon={<Download className="w-4 h-4 text-purple-400" />}
-                          iconBg="bg-purple-500/10 border-purple-500/20"
-                          title="Agent Download"
-                          desc="macOS Universal, Windows, and Linux"
-                        />
-                        <DropdownItem
-                          to="/docs/cli#troubleshooting"
-                          icon={<Sliders className="w-4 h-4 text-amber-400" />}
-                          iconBg="bg-amber-500/10 border-amber-500/20"
-                          title="Troubleshooting Guide"
-                          desc="Fix daemon permissions & socket locks"
-                        />
-                        <DropdownItem
-                          to="/dashboard"
-                          icon={<Activity className="w-4 h-4 text-emerald-400" />}
-                          iconBg="bg-emerald-500/10 border-emerald-500/20"
-                          title="System Status"
-                          desc="Local daemon and WebSocket health"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="col-span-4">
-                    <FeaturedPreviewCard
-                      tag1="CLI v1.0"
-                      tag2="Stable"
-                      title="Autonomous Agent Sync"
-                      subtitle="Audit and manage all local package registries from one unified CLI."
-                      primaryBtnText="Read Docs"
-                      primaryBtnLink="/docs/cli"
-                      secondaryBtnText="Downloads"
-                      secondaryBtnLink="/download"
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* 3. ACCOUNT & PROFILE DROPDOWN */}
-              {activeDropdown === "account" && (
-                <div className="grid grid-cols-12 gap-6 items-stretch">
-                  <div className="col-span-8 grid grid-cols-2 gap-6">
-                    {isAuth ? (
-                      <>
-                        <div>
-                          <p className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 mb-3 px-2">
-                            User Profile
-                          </p>
-                          <div className="space-y-1">
-                            <DropdownItem
-                              to="/user"
-                              icon={<User className="w-4 h-4 text-indigo-400" />}
-                              iconBg="bg-indigo-500/10 border-indigo-500/20"
-                              title="Telemetry Profile"
-                              desc="Account settings and agent code"
-                            />
-                            <DropdownItem
-                              to="/dashboard"
-                              icon={<LayoutDashboard className="w-4 h-4 text-blue-400" />}
-                              iconBg="bg-blue-500/10 border-blue-500/20"
-                              title="Main Dashboard"
-                              desc="Full telemetry control center"
-                            />
-                            <DropdownItem
-                              to="/package/python"
-                              icon={<Layers className="w-4 h-4 text-emerald-400" />}
-                              iconBg="bg-emerald-500/10 border-emerald-500/20"
-                              title="Package Inventory"
-                              desc="View all synced runtime packages"
-                            />
-                          </div>
-                        </div>
-
-                        <div>
-                          <p className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 mb-3 px-2">
-                            Session Actions
-                          </p>
-                          <div className="space-y-1">
-                            <button
-                              onClick={handleLogout}
-                              type="button"
-                              className="w-full flex items-start gap-3 p-2.5 rounded-xl hover:bg-red-500/10 border border-transparent hover:border-red-500/20 transition-all text-left group cursor-pointer"
-                            >
-                              <div className="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 flex items-center justify-center shrink-0">
-                                <LogOut className="w-4 h-4" />
-                              </div>
-                              <div>
-                                <p className="text-xs font-semibold text-zinc-200 group-hover:text-red-400 transition-colors">
-                                  Sign Out
-                                </p>
-                                <p className="text-[11px] text-zinc-500">
-                                  End active telemetry session
-                                </p>
-                              </div>
-                            </button>
-                          </div>
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <div>
-                          <p className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 mb-3 px-2">
-                            Account Access
-                          </p>
-                          <div className="space-y-1">
-                            <DropdownItem
-                              to="/auth/login"
-                              icon={<LogIn className="w-4 h-4 text-blue-400" />}
-                              iconBg="bg-blue-500/10 border-blue-500/20"
-                              title="Sign In"
-                              desc="Access your cloud telemetry metrics"
-                            />
-                            <DropdownItem
-                              to="/auth/signup"
-                              icon={<User className="w-4 h-4 text-emerald-400" />}
-                              iconBg="bg-emerald-500/10 border-emerald-500/20"
-                              title="Create Free Account"
-                              desc="Sync local telemetry across workstations"
-                            />
-                          </div>
-                        </div>
-
-                        <div>
-                          <p className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 mb-3 px-2">
-                            Standalone
-                          </p>
-                          <div className="space-y-1">
-                            <DropdownItem
-                              to="/download"
-                              icon={<Download className="w-4 h-4 text-purple-400" />}
-                              iconBg="bg-purple-500/10 border-purple-500/20"
-                              title="Download Standalone Agent"
-                              desc="Run locally without an account"
-                            />
-                            <DropdownItem
-                              to="/docs/cli"
-                              icon={<Terminal className="w-4 h-4 text-amber-400" />}
-                              iconBg="bg-amber-500/10 border-amber-500/20"
-                              title="Quickstart CLI"
-                              desc="Test commands immediately"
-                            />
-                          </div>
-                        </div>
-                      </>
-                    )}
-                  </div>
-
-                  <div className="col-span-4">
-                    {isAuth ? (
-                      <div className="h-full bg-[#12131b] border border-white/8 rounded-xl p-4.5 flex flex-col justify-between">
-                        <div>
-                          <div className="flex items-center gap-3 mb-3">
-                            <div className="w-10 h-10 rounded-full bg-indigo-500/20 border border-indigo-500/40 text-indigo-400 font-bold text-sm flex items-center justify-center">
-                              {currentUser?.name ? currentUser.name[0].toUpperCase() : "U"}
-                            </div>
-                            <div className="truncate">
-                              <p className="text-xs font-semibold text-white truncate">
-                                {currentUser?.name || currentUser?.email || "Authenticated User"}
-                              </p>
-                              <div className="flex items-center gap-1.5 mt-0.5">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                                <span className="text-[10px] text-emerald-400 font-mono">
-                                  Agent Online
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                          <p className="text-xs text-zinc-400 leading-relaxed mb-4">
-                            Your background daemon is syncing packages and runtime
-                            inventories in real-time.
-                          </p>
-                        </div>
-
-                        <div className="flex items-center gap-2 pt-2">
-                          <Link
-                            to="/dashboard"
-                            className="flex-1 text-center py-2 px-3 rounded-lg bg-[#6366f1] hover:bg-[#5457e5] text-white text-xs font-medium transition-colors shadow-sm"
-                          >
-                            Open Dashboard
-                          </Link>
-                          <Link
-                            to="/user"
-                            className="py-2 px-3 rounded-lg bg-white/6 hover:bg-white/10 text-zinc-300 hover:text-white border border-white/8 text-xs font-medium transition-colors"
-                          >
-                            Profile
-                          </Link>
-                        </div>
-                      </div>
-                    ) : (
-                      <FeaturedPreviewCard
-                        tag1="Cloud Sync"
-                        tag2="Free"
-                        title="Sync Telemetry Across Devices"
-                        subtitle="Create a free account to track local runtime health everywhere."
-                        primaryBtnText="Sign Up Free"
-                        primaryBtnLink="/auth/signup"
-                        secondaryBtnText="Log In"
-                        secondaryBtnLink="/auth/login"
-                      />
-                    )}
-                  </div>
-                </div>
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
 
       {/* ── MOBILE MENU DRAWER ── */}
@@ -867,217 +570,114 @@ export default function Navbar({
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
-            className="xl:hidden bg-[#0c0d12] border-b border-white/10 px-4 py-6 overflow-y-auto max-h-[85vh] space-y-4"
+            className="md:hidden bg-[#0c0d12]/98 backdrop-blur-2xl border-b border-white/10 px-4 py-5 overflow-y-auto max-h-[85vh] space-y-4"
           >
-            {/* Mobile Important Pages Direct Access */}
-            <div className="space-y-1 border-b border-white/6 pb-4">
-              <p className="px-2 text-[10px] font-bold uppercase tracking-wider text-zinc-500 mb-2">
-                Main Navigation
+            {/* Main Links */}
+            <div className="space-y-1">
+              <p className="px-2 text-[10px] font-bold uppercase tracking-wider text-zinc-500 mb-1.5">
+                Navigation
               </p>
-              <Link
-                to="/dashboard"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-white bg-white/6 hover:bg-white/10"
-              >
-                <LayoutDashboard size={16} className="text-primary" />
-                <span>Dashboard</span>
-              </Link>
-              <Link
-                to="/docs/cli"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-zinc-300 hover:text-white hover:bg-white/4"
-              >
-                <Terminal size={16} className="text-zinc-400" />
-                <span>CLI Documentation</span>
-              </Link>
-              <Link
-                to="/download"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-zinc-300 hover:text-white hover:bg-white/4"
-              >
-                <Download size={16} className="text-zinc-400" />
-                <span>Download Desktop Agent</span>
-              </Link>
-              <Link
-                to="/about"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-zinc-300 hover:text-white hover:bg-white/4"
-              >
-                <Info size={16} className="text-zinc-400" />
-                <span>About Us</span>
-              </Link>
-              <a
-                href="https://github.com/ShauryaG05/PackPort"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-zinc-300 hover:text-white hover:bg-white/4"
-              >
-                <GithubIcon size={16} className="text-zinc-400" />
-                <span>GitHub Repository</span>
-              </a>
+              {navLinks.map((item) => {
+                const Icon = item.icon;
+                if (item.isExternal) {
+                  return (
+                    <a
+                      key={item.name}
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold text-zinc-300 hover:text-white hover:bg-white/5 transition-colors"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <Icon size={16} className="text-zinc-400" />
+                        <span>{item.name}</span>
+                      </div>
+                      <ExternalLink size={13} className="text-zinc-500" />
+                    </a>
+                  );
+                }
+
+                return (
+                  <Link
+                    key={item.name}
+                    to={item.to}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
+                      item.isActive
+                        ? "bg-[#252a36] text-white border border-white/10"
+                        : "text-zinc-300 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Icon
+                        size={16}
+                        className={item.isActive ? "text-blue-400" : "text-zinc-400"}
+                      />
+                      <span>{item.name}</span>
+                    </div>
+                    {item.isActive && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                    )}
+                  </Link>
+                );
+              })}
             </div>
 
-            {/* Mobile Account Section */}
-            <div className="pt-2 flex flex-col gap-2">
+            {/* Auth / Account Controls */}
+            <div className="pt-3 border-t border-white/6 flex flex-col gap-2">
               {isAuth ? (
                 <>
-                  <Link
-                    to="/user"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="w-full py-2.5 px-4 rounded-xl text-center text-sm font-medium text-zinc-300 bg-white/6 border border-white/8"
-                  >
-                    Telemetry Profile ({currentUser?.name || "Developer"})
-                  </Link>
+                  <div className="p-3 rounded-xl bg-white/4 border border-white/6 flex items-center justify-between">
+                    <div>
+                      <p className="text-xs font-semibold text-white">
+                        {currentUser?.name || "Developer"}
+                      </p>
+                      <p className="text-[10px] text-zinc-400 font-mono">
+                        {currentUser?.email || "Local Workstation"}
+                      </p>
+                    </div>
+                    <Link
+                      to="/user"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="text-xs font-medium text-blue-400 hover:underline"
+                    >
+                      Settings
+                    </Link>
+                  </div>
                   <button
+                    type="button"
                     onClick={() => {
                       setMobileMenuOpen(false);
                       handleLogout();
                     }}
-                    className="w-full py-2 text-center text-xs text-red-400 font-medium cursor-pointer"
+                    className="w-full py-2.5 px-4 rounded-xl text-center text-xs font-semibold text-red-400 bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 transition-colors cursor-pointer"
                   >
                     Sign Out
                   </button>
                 </>
               ) : (
-                <>
+                <div className="grid grid-cols-2 gap-2">
                   <Link
                     to="/auth/login"
-                    className="w-full py-2.5 px-4 rounded-xl text-center text-sm font-semibold text-white bg-[#6366f1]"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="py-2.5 px-3 rounded-xl text-center text-xs font-semibold text-white bg-primary hover:bg-primary-container transition-colors shadow-xs"
                   >
                     Sign In
                   </Link>
                   <Link
-                    to="/docs/cli"
-                    className="w-full py-2.5 px-4 rounded-xl text-center text-sm font-medium text-zinc-300 bg-white/6 border border-white/8"
+                    to="/auth/signup"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="py-2.5 px-3 rounded-xl text-center text-xs font-semibold text-zinc-300 bg-white/6 hover:bg-white/10 border border-white/8 transition-colors"
                   >
-                    Read Docs
+                    Sign Up
                   </Link>
-                </>
+                </div>
               )}
             </div>
           </motion.div>
         )}
       </AnimatePresence>
     </header>
-  );
-}
-
-// Sub-component for individual dropdown items with glowing icons
-function DropdownItem({ to, icon, iconBg = "bg-white/6 border-white/10", title, desc }) {
-  return (
-    <Link
-      to={to}
-      className="flex items-start gap-3 p-2 rounded-xl hover:bg-white/6 border border-transparent hover:border-white/6 transition-all text-left group cursor-pointer"
-    >
-      <div
-        className={`w-7 h-7 rounded-lg ${iconBg} border flex items-center justify-center shrink-0 mt-0.5 transition-transform group-hover:scale-105`}
-      >
-        {icon}
-      </div>
-      <div className="min-w-0">
-        <p className="text-xs font-semibold text-zinc-200 group-hover:text-white transition-colors truncate">
-          {title}
-        </p>
-        {desc && (
-          <p className="text-[11px] text-zinc-500 line-clamp-1 leading-tight mt-0.5">
-            {desc}
-          </p>
-        )}
-      </div>
-    </Link>
-  );
-}
-
-// Sub-component for the Right Featured Preview Card (Faithfully reproducing the reference image)
-function FeaturedPreviewCard({
-  tag1 = "Primary / 6",
-  tag2 = "16px",
-  title = "Advance UI Customization",
-  subtitle = "Personalize your collaboration experience",
-  primaryBtnText = "View Docs",
-  primaryBtnLink = "/docs/cli",
-  secondaryBtnText = "Learn More",
-  secondaryBtnLink = "/download",
-}) {
-  return (
-    <div className="h-full bg-[#12131b] border border-white/8 rounded-xl p-4 flex flex-col justify-between shrink-0">
-      {/* Top Visual Mockup Interface (Replicating the reference screenshot) */}
-      <div className="relative w-full h-32 rounded-lg bg-[#08090e] border border-white/6 p-3 overflow-hidden flex flex-col justify-between">
-        {/* Subtle grid dots in background */}
-        <div
-          className="absolute inset-0 opacity-20 pointer-events-none"
-          style={{
-            backgroundImage:
-              "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.2) 1px, transparent 0)",
-            backgroundSize: "12px 12px",
-          }}
-        />
-
-        {/* Top interactive elements */}
-        <div className="flex items-center justify-end gap-1.5 relative z-10">
-          <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/6 text-zinc-400 border border-white/8 font-mono">
-            Open ▾
-          </span>
-          <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/6 text-zinc-400 border border-white/8 font-mono">
-            P0 ▾
-          </span>
-        </div>
-
-        {/* Center UI Node with Bounding Box and selection tags */}
-        <div className="relative z-10 my-auto">
-          {/* Tag 1 (Pink/Red Pill Badge) */}
-          <div className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-[#f43f5e]/20 border border-[#f43f5e]/40 text-[#f43f5e] text-[9px] font-mono font-medium mb-1 shadow-sm">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#f43f5e]" />
-            <span>{tag1}</span>
-          </div>
-
-          {/* Wireframe Card with handles */}
-          <div className="relative w-full py-1.5 px-2 rounded-md bg-white/4 border border-dashed border-white/20 flex items-center justify-between">
-            <span className="text-[10px] text-zinc-300 font-mono font-medium">
-              runtime: Node.js • v20.x
-            </span>
-
-            {/* Corner selection handle */}
-            <span className="absolute -bottom-1 -right-1 w-2 h-2 bg-blue-500 border border-white rounded-[1px]" />
-          </div>
-
-          {/* Tag 2 (Sky-blue Pill Badge) */}
-          <div className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-tertiary/20 border border-tertiary/40 text-tertiary text-[9px] font-mono font-medium mt-1">
-            <span>{tag2}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Card Content */}
-      <div className="mt-3">
-        <h4 className="text-xs font-semibold text-white tracking-tight">
-          {title}
-        </h4>
-        <p className="text-[11px] text-zinc-400 mt-1 leading-relaxed line-clamp-2">
-          {subtitle}
-        </p>
-      </div>
-
-      {/* Action Buttons */}
-      <div className="flex items-center gap-2 mt-4 pt-2 border-t border-white/6">
-        {secondaryBtnLink && (
-          <Link
-            to={secondaryBtnLink}
-            className="flex-1 text-center py-1.5 px-2.5 rounded-lg bg-white/6 hover:bg-white/10 text-zinc-300 hover:text-white border border-white/8 text-xs font-medium transition-colors"
-          >
-            {secondaryBtnText}
-          </Link>
-        )}
-        {primaryBtnLink && (
-          <Link
-            to={primaryBtnLink}
-            className="flex-1 text-center py-1.5 px-2.5 rounded-lg bg-[#6366f1] hover:bg-[#5457e5] text-white text-xs font-medium transition-colors shadow-sm"
-          >
-            {primaryBtnText}
-          </Link>
-        )}
-      </div>
-    </div>
   );
 }
