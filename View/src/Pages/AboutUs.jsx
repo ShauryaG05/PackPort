@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import PackPortLogo from "../components/PackPortLogo";
+import Navbar, { GithubIcon } from "../components/Navbar";
 import {
   ShieldCheck,
   Terminal,
@@ -15,156 +15,237 @@ import {
   Globe,
   GitBranch,
   Code2,
+  Database,
+  Radio,
+  Server,
+  Sparkles,
 } from "lucide-react";
-
-function GithubIcon({ size = 16, className = "" }) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      className={className}
-    >
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
-      />
-    </svg>
-  );
-}
 
 export default function AboutUs() {
   return (
-    <div className="min-h-full w-full bg-[#111317] text-[#c9d1d9] font-sans pb-20 selection:bg-primary/30">
-      {/* Top Hero Section */}
-      <div className="relative overflow-hidden border-b border-white/6 bg-linear-to-b from-[#181a22] to-[#111317] py-16 px-6 md:px-12">
-        <div className="max-w-4xl mx-auto space-y-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-xs font-mono text-primary font-semibold">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span>About PackPort Telemetry Engine</span>
+    <div className="min-h-screen w-full bg-[#0d1117] text-[#c9d1d9] font-sans flex flex-col justify-between antialiased selection:bg-blue-500/30 selection:text-white">
+      {/* ── 1. Standardized Top Navigation Bar ── */}
+      <Navbar />
+
+      <main className="flex-1">
+        {/* ── 2. Top Hero Section ── */}
+        <div className="relative overflow-hidden border-b border-white/8 bg-linear-to-b from-[#141620] via-[#0f1118] to-[#0d1117] py-16 sm:py-20 px-6 md:px-12">
+          {/* Subtle ambient light beam */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-48 bg-blue-500/10 blur-[90px] rounded-full pointer-events-none" />
+
+          <div className="max-w-4xl mx-auto space-y-6 relative z-10">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-xs font-mono text-blue-400 font-semibold shadow-xs">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span>About PackPort Telemetry Engine</span>
+            </div>
+
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-white leading-[1.12]">
+              Unified Runtime & Port Visibility for Engineering Teams
+            </h1>
+
+            <p className="text-base sm:text-lg text-zinc-300 max-w-2xl leading-relaxed">
+              PackPort is an open-source developer telemetry workstation. It continuously monitors
+              local package ecosystems, catches upstream dependency drift, and visualizes developer
+              ports across Python, Node.js, and Local AI runtimes.
+            </p>
+
+            <div className="flex flex-wrap items-center gap-3 pt-2">
+              <a
+                href="https://github.com/ShauryaG05/PackPort"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white text-gray-900 font-semibold text-xs hover:bg-gray-100 transition-all shadow-md active:scale-95"
+              >
+                <GithubIcon size={16} />
+                <span>Star on GitHub</span>
+                <ExternalLink size={13} className="text-gray-600" />
+              </a>
+
+              <Link
+                to="/dashboard"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#20232b] hover:bg-[#282d38] border border-white/10 text-white font-semibold text-xs transition-all active:scale-95 shadow-sm"
+              >
+                <span>Open Dashboard</span>
+                <ArrowRight size={14} className="text-zinc-400" />
+              </Link>
+
+              <Link
+                to="/docs/cli"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/4 hover:bg-white/8 border border-white/8 text-zinc-300 hover:text-white font-medium text-xs transition-colors"
+              >
+                <Terminal size={14} />
+                <span>CLI Terminal Guide</span>
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* ── 3. Main Content Area ── */}
+        <div className="max-w-4xl mx-auto px-6 md:px-12 pt-14 space-y-14">
+          {/* Why We Built PackPort */}
+          <section className="space-y-4">
+            <h2 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2.5">
+              <Zap className="w-5 h-5 text-amber-400" />
+              <span>Why We Built PackPort</span>
+            </h2>
+            <p className="text-sm text-zinc-300 leading-relaxed">
+              Modern full-stack developers often balance multiple language environments at once—Python
+              virtual environments, npm global scripts, and local Ollama model weights. Dependencies drift
+              out of date silently, creating CVE vulnerabilities, compilation breakage, and port conflicts
+              on localhost. PackPort bridges this gap with a lightweight background daemon that reports
+              actionable version telemetry in real time.
+            </p>
+          </section>
+
+          {/* 3 Core Pillars Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div className="p-6 rounded-2xl bg-[#141620] border border-white/8 space-y-3.5 hover:border-blue-500/30 transition-all shadow-lg group">
+              <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 font-bold group-hover:scale-105 transition-transform">
+                <Layers size={20} />
+              </div>
+              <h3 className="text-sm font-bold text-white">Multi-Ecosystem Drift</h3>
+              <p className="text-xs text-zinc-400 leading-relaxed">
+                Automatic auditing across PyPI, npm registries, and Ollama weight hubs so you always know
+                when security patches and upgrades are available.
+              </p>
+            </div>
+
+            <div className="p-6 rounded-2xl bg-[#141620] border border-white/8 space-y-3.5 hover:border-emerald-500/30 transition-all shadow-lg group">
+              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold group-hover:scale-105 transition-transform">
+                <Lock size={20} />
+              </div>
+              <h3 className="text-sm font-bold text-white">Zero Source Code Access</h3>
+              <p className="text-xs text-zinc-400 leading-relaxed">
+                PackPort only reads package metadata and port telemetry. Your proprietary codebase,
+                secrets, and source files never leave your machine.
+              </p>
+            </div>
+
+            <div className="p-6 rounded-2xl bg-[#141620] border border-white/8 space-y-3.5 hover:border-purple-500/30 transition-all shadow-lg group">
+              <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 font-bold group-hover:scale-105 transition-transform">
+                <Activity size={20} />
+              </div>
+              <h3 className="text-sm font-bold text-white">Real-Time Sockets</h3>
+              <p className="text-xs text-zinc-400 leading-relaxed">
+                Instant bidirectional event streaming via Socket.IO so telemetry scans and upgrade tasks
+                render live in your browser window.
+              </p>
+            </div>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
-            Unified Runtime & Port Visibility for Engineering Teams
-          </h1>
+          {/* Architecture Overview */}
+          <section className="p-6 sm:p-8 rounded-2xl bg-[#141620] border border-white/8 space-y-6 shadow-xl">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center">
+                <Server size={18} />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-white">Telemetry Engine Architecture</h3>
+                <p className="text-xs text-zinc-400">Continuous background monitoring without performance overhead</p>
+              </div>
+            </div>
 
-          <p className="text-base sm:text-lg text-gray-300 max-w-2xl leading-relaxed">
-            PackPort is an open-source developer telemetry workstation. It continuously monitors
-            local package ecosystems, catches upstream dependency drift, and visualizes developer
-            ports across Python, Node.js, and Local AI runtimes.
-          </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-mono">
+              <div className="p-4 rounded-xl bg-[#0e1017] border border-white/6 space-y-2">
+                <span className="text-blue-400 font-bold flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                  Python & PyPI
+                </span>
+                <p className="text-zinc-400 font-sans text-[11px] leading-relaxed">
+                  Scans virtual environments and global pip modules, detecting outdated distributions and lockfile drift.
+                </p>
+              </div>
 
-          <div className="flex flex-wrap items-center gap-3 pt-2">
+              <div className="p-4 rounded-xl bg-[#0e1017] border border-white/6 space-y-2">
+                <span className="text-emerald-400 font-bold flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                  Node.js & npm
+                </span>
+                <p className="text-zinc-400 font-sans text-[11px] leading-relaxed">
+                  Monitors global npm packages, yarn caches, and active Node runtimes for SemVer updates.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-xl bg-[#0e1017] border border-white/6 space-y-2">
+                <span className="text-purple-400 font-bold flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+                  Ollama Local AI
+                </span>
+                <p className="text-zinc-400 font-sans text-[11px] leading-relaxed">
+                  Tracks local GGUF models, VRAM utilization, and model weight revisions directly on host.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-xl bg-[#0e1017] border border-white/6 space-y-2">
+                <span className="text-amber-400 font-bold flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                  Port Listener
+                </span>
+                <p className="text-zinc-400 font-sans text-[11px] leading-relaxed">
+                  Visualizes active developer sockets (e.g. 3000, 5173, 8000, 11434) to catch binding conflicts.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* Open Source & GitHub Card */}
+          <section className="p-6 sm:p-8 rounded-2xl bg-linear-to-r from-[#171a24] to-[#12141c] border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-2xl">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <GithubIcon size={20} className="text-white" />
+                <h3 className="text-base font-bold text-white">100% Free & Open Source</h3>
+              </div>
+              <p className="text-xs text-zinc-400 max-w-lg leading-relaxed">
+                PackPort is published on GitHub under the MIT License. Contributions, feedback, and
+                feature requests for new runtimes (Rust Cargo, Go Modules, Docker) are always welcome.
+              </p>
+            </div>
+
             <a
               href="https://github.com/ShauryaG05/PackPort"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white text-gray-900 font-semibold text-xs hover:bg-gray-200 transition-all shadow-md active:scale-95"
+              className="px-5 py-2.5 rounded-xl bg-primary hover:bg-primary-container text-white font-semibold text-xs flex items-center gap-2 shrink-0 shadow-[0_0_15px_rgba(37,99,235,0.35)] transition-all active:scale-95"
             >
-              <GithubIcon size={16} />
-              <span>Star on GitHub</span>
-              <ExternalLink size={13} className="text-gray-600" />
+              <GitBranch size={15} />
+              <span>View on GitHub</span>
+              <ExternalLink size={12} />
             </a>
+          </section>
+        </div>
+      </main>
 
-            <Link
-              to="/dashboard"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#20232b] hover:bg-[#282d38] border border-white/8 text-white font-semibold text-xs transition-all active:scale-95"
-            >
-              <span>Open Dashboard</span>
-              <ArrowRight size={14} className="text-gray-400" />
-            </Link>
+      {/* ── 4. Standard Site Footer ── */}
+      <footer className="border-t border-white/8 bg-[#08090d] py-8 mt-20">
+        <div className="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-400">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span>PackPort Telemetry Engine • All systems operational</span>
+          </div>
 
-            <Link
-              to="/docs/cli"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-transparent hover:bg-white/5 text-gray-400 hover:text-white font-medium text-xs transition-colors"
-            >
-              <Terminal size={14} />
-              <span>CLI Terminal Guide</span>
+          <div className="flex flex-wrap items-center gap-6">
+            <Link to="/dashboard" className="hover:text-white transition-colors">
+              Dashboard
             </Link>
+            <Link to="/docs/cli" className="hover:text-white transition-colors">
+              Documentation
+            </Link>
+            <Link to="/download" className="hover:text-white transition-colors">
+              Download
+            </Link>
+            <a
+              href="https://github.com/ShauryaG05/PackPort"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-white transition-colors"
+            >
+              GitHub
+            </a>
+            <span className="text-zinc-600">|</span>
+            <span>&copy; {new Date().getFullYear()} PackPort. MIT License.</span>
           </div>
         </div>
-      </div>
-
-      {/* Main Content Area */}
-      <div className="max-w-4xl mx-auto px-6 md:px-12 pt-12 space-y-12">
-        {/* Core Pillars */}
-        <section className="space-y-4">
-          <h2 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
-            <Zap className="w-5 h-5 text-amber-400" />
-            <span>Why We Built PackPort</span>
-          </h2>
-          <p className="text-sm text-gray-300 leading-relaxed">
-            Modern full-stack developers often balance multiple language environments at once—Python
-            virtual environments, npm global scripts, and local Ollama model weights. Dependencies drift
-            out of date silently, creating CVE vulnerabilities, compilation breakage, and port conflicts
-            on localhost. PackPort bridges this gap with a lightweight background daemon that reports
-            actionable version telemetry in real time.
-          </p>
-        </section>
-
-        {/* 3 Pillars Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <div className="p-5 rounded-2xl bg-[#181a20] border border-white/6 space-y-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 font-bold">
-              <Layers size={20} />
-            </div>
-            <h3 className="text-sm font-bold text-white">Multi-Ecosystem Drift</h3>
-            <p className="text-xs text-gray-400 leading-relaxed">
-              Automatic auditing across PyPI, npm registries, and Ollama weight hubs so you always know
-              when security patches are available.
-            </p>
-          </div>
-
-          <div className="p-5 rounded-2xl bg-[#181a20] border border-white/6 space-y-3">
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold">
-              <Lock size={20} />
-            </div>
-            <h3 className="text-sm font-bold text-white">Zero Source Code Access</h3>
-            <p className="text-xs text-gray-400 leading-relaxed">
-              PackPort only reads package metadata and port telemetry. Your proprietary codebase,
-              secrets, and source files never leave your machine.
-            </p>
-          </div>
-
-          <div className="p-5 rounded-2xl bg-[#181a20] border border-white/6 space-y-3">
-            <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 font-bold">
-              <Activity size={20} />
-            </div>
-            <h3 className="text-sm font-bold text-white">Real-Time Sockets</h3>
-            <p className="text-xs text-gray-400 leading-relaxed">
-              Instant bidirectional event streaming via Socket.IO so telemetry scans and upgrade tasks
-              render live in your browser window.
-            </p>
-          </div>
-        </div>
-
-        {/* Open Source & GitHub Card */}
-        <section className="p-6 rounded-2xl bg-linear-to-r from-[#1c1f28] to-[#161820] border border-white/8 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <GithubIcon size={20} className="text-white" />
-              <h3 className="text-base font-bold text-white">100% Free & Open Source</h3>
-            </div>
-            <p className="text-xs text-gray-400 max-w-lg leading-relaxed">
-              PackPort is published on GitHub under the MIT License. Contributions, feedback, and
-              feature requests for new runtimes (Rust Cargo, Go Modules, Docker) are always welcome.
-            </p>
-          </div>
-
-          <a
-            href="https://github.com/ShauryaG05/PackPort"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-5 py-2.5 rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold text-xs flex items-center gap-2 shrink-0 shadow-sm transition-all active:scale-95"
-          >
-            <GitBranch size={15} />
-            <span>View on GitHub</span>
-            <ExternalLink size={12} />
-          </a>
-        </section>
-      </div>
+      </footer>
     </div>
   );
 }
