@@ -1,0 +1,161 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "PackPort End-to-End Package Telemetry Flow",
+    "output": "docs/index.html",
+    "viewBox": [1080, 780],
+    "column_fit": "spread",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/ShauryaG05/PackPort.git",
+      "provider": "github",
+      "revision": "997608e0a91b130c5a90ee42fee715b3a251ec7b"
+    }
+  },
+  "participants": [
+    {
+      "id": "user",
+      "type": "external",
+      "label": "Developer",
+      "sublabel": "browser & terminal",
+      "icon": "person"
+    },
+    {
+      "id": "view",
+      "type": "frontend",
+      "label": "PackPort UI",
+      "sublabel": "React + Socket.IO",
+      "icon": "frontend",
+      "sources": [
+        { "path": "View/src/App.jsx", "line": 34, "label": "routes & layout" },
+        { "path": "View/src/Pages/Dashboard.jsx", "line": 250, "label": "socket connection & telemetry" },
+        { "path": "View/src/components/Navbar.jsx", "line": 130, "label": "standard navigation & auth" }
+      ]
+    },
+    {
+      "id": "server",
+      "type": "backend",
+      "label": "PackPort API",
+      "sublabel": "Express + Socket.IO",
+      "icon": "backend",
+      "sources": [
+        { "path": "server/src/Routes/authRoutes.js", "line": 20, "label": "auth & agentCode generation" },
+        { "path": "server/src/Routes/agentRoutes.js", "line": 37, "label": "device token linking" },
+        { "path": "server/src/Routes/agentRoutes.js", "line": 247, "label": "telemetry scan routes" },
+        { "path": "server/server.js", "line": 21, "label": "room routing & socket handlers" }
+      ]
+    },
+    {
+      "id": "agent",
+      "type": "external",
+      "label": "Local Agent",
+      "sublabel": "CLI daemon on workstation",
+      "icon": "external",
+      "sources": [
+        { "path": "agent/agent.js", "line": 53, "label": "device pairing handler" },
+        { "path": "agent/agent.js", "line": 456, "label": "python_scan execution" },
+        { "path": "agent/agent.js", "line": 545, "label": "node_scan execution" },
+        { "path": "agent/agent.js", "line": 432, "label": "streaming package updates" }
+      ]
+    },
+    {
+      "id": "db",
+      "type": "database",
+      "label": "MongoDB",
+      "sublabel": "User telemetry & device store",
+      "icon": "database",
+      "sources": [
+        { "path": "server/src/models/userModel.js", "line": 25, "label": "package telemetry schema" },
+        { "path": "server/src/models/userModel.js", "line": 39, "label": "device enrollment tokens" }
+      ]
+    }
+  ],
+  "segments": [
+    { "from": 150, "to": 310, "label": "1. Authentication & Device Linking" },
+    { "from": 318, "to": 430, "label": "2. Real-Time Presence & Heartbeat" },
+    { "from": 438, "to": 595, "label": "3. Multi-Runtime Telemetry Scan" },
+    { "from": 605, "to": 750, "label": "4. Live Streaming Package Updates" }
+  ],
+  "messages": [
+    { "id": "auth-req", "from": "user", "to": "view", "y": 165, "label": "Sign up / Log in", "variant": "default" },
+    { "id": "auth-post", "from": "view", "to": "server", "y": 190, "label": "POST /auth/signup | /auth/login", "variant": "emphasis" },
+    { "id": "user-db", "from": "server", "to": "db", "y": 215, "label": "create user + generate unique agentCode", "variant": "default" },
+    { "id": "jwt-cookie", "from": "server", "to": "view", "y": 240, "label": "Set HttpOnly JWT Cookie", "variant": "security" },
+    { "id": "agent-link", "from": "user", "to": "agent", "y": 265, "label": "packport link <agentCode>", "variant": "default" },
+    { "id": "link-post", "from": "agent", "to": "server", "y": 288, "label": "POST /agent/link (device token issue)", "variant": "emphasis" },
+    { "id": "save-token", "from": "server", "to": "db", "y": 308, "label": "store agentTokens [{ token, hostname, arch }]", "variant": "emphasis" },
+
+    { "id": "agent-connect", "from": "agent", "to": "server", "y": 335, "label": "socket.connect({ agentCode, token })", "variant": "dashed" },
+    { "id": "verify-token", "from": "server", "to": "db", "y": 358, "label": "verify agentToken & join room agent:${code}", "variant": "security" },
+    { "id": "view-connect", "from": "view", "to": "server", "y": 382, "label": "register_dashboard (join room user:${code})", "variant": "dashed" },
+    { "id": "agent-status", "from": "server", "to": "view", "y": 408, "label": "emit('agent_status', { online: true })", "variant": "return" },
+
+    { "id": "scan-trigger", "from": "view", "to": "server", "y": 450, "label": "GET /agent/scan/:language (python/node)", "variant": "emphasis" },
+    { "id": "scan-dispatch", "from": "server", "to": "agent", "y": 475, "label": "socket.to('agent:${code}').emit('python_scan')", "variant": "dashed" },
+    { "id": "local-audit", "from": "agent", "to": "agent", "y": 500, "label": "run pip list / npm outdated / ollama list", "variant": "default" },
+    { "id": "telemetry-result", "from": "agent", "to": "server", "y": 525, "label": "emit('result_python_packages', telemetry)", "variant": "emphasis" },
+    { "id": "persist-telemetry", "from": "server", "to": "db", "y": 548, "label": "updateOne({ agentCode }, { packages, lastScanned })", "variant": "emphasis" },
+    { "id": "scan-complete", "from": "server", "to": "view", "y": 570, "label": "socket.to('user:${code}').emit('scan_complete')", "variant": "dashed" },
+    { "id": "view-refresh", "from": "view", "to": "server", "y": 590, "label": "GET /agent/packages/:lang -> 200 Telemetry JSON", "variant": "return" },
+
+    { "id": "upgrade-request", "from": "view", "to": "server", "y": 625, "label": "POST /agent/update/:pkgName", "variant": "emphasis" },
+    { "id": "upgrade-dispatch", "from": "server", "to": "agent", "y": 650, "label": "socket.to('agent:${code}').emit('package_update')", "variant": "dashed" },
+    { "id": "stream-progress", "from": "agent", "to": "server", "y": 678, "label": "emit('update_progress', { progress, logs })", "variant": "dashed" },
+    { "id": "forward-progress", "from": "server", "to": "view", "y": 700, "label": "emit('package_update_progress', stream)", "variant": "return" },
+    { "id": "finish-upgrade", "from": "agent", "to": "server", "y": 722, "label": "emit('update_result', { success: true })", "variant": "emphasis" },
+    { "id": "forward-finish", "from": "server", "to": "view", "y": 745, "label": "emit('package_update_finished') -> auto-fetch", "variant": "return" }
+  ],
+  "activations": [
+    { "participant": "view", "from": 160, "to": 750, "type": "frontend" },
+    { "participant": "server", "from": 185, "to": 750, "type": "backend" },
+    { "participant": "db", "from": 210, "to": 225, "type": "database" },
+    { "participant": "agent", "from": 260, "to": 315, "type": "external" },
+    { "participant": "db", "from": 305, "to": 315, "type": "database" },
+    { "participant": "agent", "from": 330, "to": 415, "type": "external" },
+    { "participant": "db", "from": 355, "to": 365, "type": "database" },
+    { "participant": "agent", "from": 470, "to": 535, "type": "external" },
+    { "participant": "db", "from": 545, "to": 555, "type": "database" },
+    { "participant": "agent", "from": 645, "to": 730, "type": "external" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Cryptographic Device Linking & Auth",
+      "items": [
+        "Signup assigns each user a unique agentCode; passwords hashed via bcrypt.",
+        "CLI workstation calls POST /agent/link to enroll with hostname/platform metadata.",
+        "Server generates a cryptographically secure 32-byte device token stored in user.agentTokens.",
+        "JWT session token is issued as an HttpOnly, Secure, SameSite cookie."
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Real-Time Room Routing & Presence",
+      "items": [
+        "Socket.IO separates agents into agent:${code} and dashboards into user:${code} rooms.",
+        "On socket connection, server checks room membership and broadcasts agent_status (online/offline).",
+        "Targeted room emission ensures zero cross-tenant event leakage between developer accounts."
+      ]
+    },
+    {
+      "dot": "orange",
+      "title": "Multi-Ecosystem Telemetry Scans",
+      "items": [
+        "Scans triggered via REST or dashboard buttons are pushed to workstation via socket events.",
+        "Agent runs isolated CLI audits: pip list --outdated --format=json, npm outdated -g, and Ollama models.",
+        "Telemetry payload is persisted to MongoDB, followed by a scan_complete event to auto-refresh the UI."
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Live Streaming Updates & Privacy",
+      "items": [
+        "Upgrade actions dispatch package_update with language and package coordinates.",
+        "Agent streams real-time stdout logs and progress stages (downloading, installing, verifying).",
+        "Zero Source Code Access: Only package metadata and port telemetry are read—source files and secrets never leave your workstation."
+      ]
+    }
+  ]
+}
+
